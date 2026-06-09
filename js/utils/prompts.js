@@ -22,8 +22,14 @@ ${job.desc || '(sin descripción proporcionada)'}`.trim();
  * Full autonomous prompt for fit analysis (works in any AI).
  */
 export function promptFIT(job, cvText) {
-  return `Actuá como un experto en selección de talento IT.
-Analizá la compatibilidad entre el perfil del candidato y la oferta laboral indicada.
+  return `Actuá como un Lead Technical Recruiter y experto en selección de talento IT de alta exigencia. Tu objetivo es realizar un screening objetivo, riguroso y libre de sesgos normativos, penalizando la falta de evidencia explícita en el CV.
+
+Analizá la compatibilidad entre el CV del candidato y la oferta laboral provista.
+
+=== INSTRUCCIONES DE EVALUACIÓN ===
+1. Sé estricto con el Seniority y los Stack Tecnológicos: Si la oferta pide una tecnología como "Excluyente" y no está explícita en el CV, asumí que no la posee y penalizá el puntaje.
+2. No asumas experiencia: La proximidad de un término no implica dominio. Evaluá según proyectos, años de uso o logros descritos.
+3. Justificación basada en datos: Cada fortaleza o brecha debe hacer referencia directa a una sección del CV o de la oferta.
 
 === CV DEL CANDIDATO (Agustín Thomas Gutiérrez Ioime) ===
 ${cvText}
@@ -31,11 +37,22 @@ ${cvText}
 === OFERTA LABORAL ===
 ${ofertaBlock(job)}
 
-Respondé con el siguiente formato:
-1. Porcentaje de fit estimado (0–100%) y justificación concisa.
-2. Fortalezas del perfil para este rol (máx. 5 puntos).
-3. Brechas o áreas a reforzar (máx. 3 puntos).
-4. Recomendación final: Aplicar / Aplicar con nota / No aplicar — con una línea de fundamento.`;
+Respondé estrictamente con el siguiente formato Markdown, manteniendo un tono profesional, crítico y corporativo:
+
+### 1. Score de Fit General
+* **Porcentaje de Fit:** [X]% (Calculado de forma matemática: ponderá 60% Hard Skills excluyentes, 20% Seniority/Metodologías, 20% Soft Skills/Cultura).
+* **Justificación Ejecutiva:** [Máximo 3 líneas que resuman el porqué de la calificación].
+
+### 2. Fortalezas Clave (Máx. 5 puntos)
+* [Categoría: Hard/Soft/Logro] - **[Habilidad]:** [Breve evidencia del CV que lo respalda].
+
+### 3. Brechas Críticas y Áreas a Reforzar (Máx. 3 puntos)
+* [Categoría: Stack/Seniority/Falta de Evidencia] - **[Brecha]:** [Qué le falta o qué no está claro en el CV respecto a la oferta].
+
+### 4. Recomendación y Next Steps
+* **Decisión:** [Aplicar / Aplicar con nota de atención / No aplicar]
+* **Fundamento:** [Una sola línea estratégica].
+* **Pregunta de Validación:** [Sugerí una pregunta técnica o de comportamiento clave que el reclutador debería hacerle en la primera entrevista para validar la brecha más importante encontrada].`;
 }
 
 // ── Prompt: Adaptar CV ───────────────────────────────────────────────────────
@@ -43,8 +60,14 @@ Respondé con el siguiente formato:
  * Full autonomous CV adaptation prompt (works in any AI).
  */
 export function promptAdaptarCV(job, cvText) {
-  return `Actuá como un experto en CVs para el sector IT.
-Adaptá el CV que se provee a continuación para maximizar las probabilidades de pasar el filtro ATS y captar la atención del reclutador en la oferta indicada.
+  return `Actuá como un experto en Redacción de CVs de Alto Impacto para el sector IT y especialista en optimización de algoritmos ATS (Applicant Tracking Systems). 
+
+Tu objetivo es adaptar de forma estratégica el CV del candidato para la oferta laboral provista, maximizando el "Keyword Match" sin caer en prácticas de spam y manteniendo la autenticidad del perfil.
+
+=== REGLAS ESTRICTAS DE NEGOCIO ===
+1. PROHIBIDO INVENTAR: No agregues tecnologías, herramientas, años de experiencia o roles que el candidato no mencione en su CV original.
+2. LIMITACIÓN DE MÉTRICAS: Si el CV original no tiene métricas numéricas, no las inventes. En su lugar, usá la estructura de impacto: "Acción (Verbo) + Contexto Técnico + Resultado/Propósito" (Método XYZ de Google).
+3. TONO: Profesional, técnico, directo y orientado al logro. Evitá adjetivos vacíos como "motivado", "proactivo" o "apasionado".
 
 === CV ORIGINAL (Agustín Thomas Gutiérrez Ioime) ===
 ${cvText}
@@ -52,12 +75,44 @@ ${cvText}
 === OFERTA LABORAL ===
 ${ofertaBlock(job)}
 
-Devolvé:
-1. Resumen profesional reescrito, orientado específicamente a este rol (3–4 líneas).
-2. Los 4–6 bullets de experiencia laboral que más impactan para esta posición, reescritos con verbos de acción y métricas donde sea posible.
-3. Lista de habilidades técnicas ordenadas por relevancia para esta oferta.
-4. Sugerencia de qué secciones o puntos reducir o eliminar para esta postulación.
-5. El CV completo reestructurado y listo para copiar.`;
+Analizá ambas fuentes y devolvé la información estructurada bajo el siguiente formato:
+
+### 1. Diagnóstico de Adaptación (Breve)
+* **Keywords Críticas Insertadas:** [Lista de 5-7 términos técnicos o metodologías de la oferta que se incorporaron orgánicamente].
+* **Estrategia de Descarte:** [Qué proyectos o tecnologías secundarias del CV original sugerís pasar a segundo plano o resumir para que no hagan "ruido" visual en esta postulación].
+
+### 2. Resumen Profesional Optimizado (Máx. 4 líneas)
+[Escribí un párrafo compacto que responda: Qué es (Rol técnico) + Cuánta experiencia/Seniority tiene + Stack principal relevante para la oferta + Mayor valor que aporta para resolver el problema de la empresa].
+
+### 3. Core Skills Reordenadas
+* **Technical Skills (Relevantes para el puesto):** [Tecnologías ordenadas de Mayor a Menor importancia según la oferta].
+* **Tools & Methodologies:** [Herramientas, metodologías ágiles o ERPs críticos para este rol].
+
+### 4. Bloque de Experiencia Rediseñado (Los 4-6 bullets más potentes)
+[Reescribí los bullets de los trabajos más relevantes usando verbos de acción fuertes en primera persona del pasado (ej: "Diseñé", "Optimicé", "Implementé"). Asegurate de que la tecnología de la oferta aparezca en el contexto de la acción].
+
+### 5. CV Completo Reestructurado (Listo para copiar)
+[Generá la versión final unificada del CV utilizando los datos de contacto del original e integrando las optimizaciones previas. Excluí tablas u otros elementos visuales complejos. El formato debe seguir estrictamente este orden y diseño en Markdown limpio]:
+
+# [NOMBRE Y APELLIDO DEL CANDIDATO]
+[Datos de contacto: Email | LinkedIn | Teléfono | Ubicación]
+
+## Perfil profesional
+[Insertar acá el párrafo del Resumen Profesional Optimizado generado en el punto 2].
+
+## Experiencia Laboral
+[Estructurar de forma cronológica inversa: **Puesto** - Empresa (Mes/Año Inicio - Mes/Año Fin o Actualidad). Incorporar debajo de cada rol los bullets de impacto técnico diseñados en el punto 4].
+
+## Formación académica
+[Listar títulos, instituciones y estado/fechas extraídos estrictamente del CV original].
+
+## Habilidades técnicas
+* **Lenguajes y Tecnologías:** [Listado limpio de tecnologías relevantes priorizadas para el puesto].
+* **Sistemas y Herramientas:** [ERPs, plataformas de automatización, bases de datos o software específico del CV que aplique al rol].
+
+## Habilidades blandas & Idiomas
+* **Habilidades Blandas:** [Máximo 4 competencias interpersonales o metodológicas demostradas implícitamente en la experiencia del candidato, sin usar clichés].
+* **Idiomas:** [Listar idiomas y niveles según el CV original].`;
 }
 
 // ── Prompt: Crear Carta de Presentación ─────────────────────────────────────
@@ -65,8 +120,14 @@ Devolvé:
  * Full autonomous cover letter prompt (works in any AI).
  */
 export function promptCarta(job, cvText) {
-  return `Actuá como un experto en comunicación profesional para el sector IT.
-Redactá una carta de presentación en español para la siguiente postulación laboral.
+  return `Actuá como un experto en Outbound Recruiting y Copywriting Profesional para el sector IT. 
+
+Tu objetivo es redactar un mensaje de contacto (Pitch de Enganche) hiperconciso, directo y de alto impacto para enviarle a un reclutador. El texto debe generar la curiosidad justa para que el reclutador desee abrir el CV adjunto o revisar el perfil del candidato, evitando repetir el CV entero en prosa.
+
+=== REGLAS DE REDACCIÓN ===
+1. BREVEDAD ABSOLUTA: El mensaje no debe superar las 150 palabras en su versión de Email y debe ser extremadamente directo.
+2. ENFOQUE EN VALOR: En lugar de decir "tengo experiencia en X", redactalo como "en mi rol actual en Corrugadora Centro S.A. me enfoco en resolver [Problema clave de la oferta] mediante automatización y optimización de ERPs".
+3. TONO: Profesional, moderno, fresco y al grano. Quedan prohibidos los saludos excesivamente formales (ej: "De mi mayor consideración", "Estimado/a señor/a") y las frases cliché.
 
 === CV DEL CANDIDATO (Agustín Thomas Gutiérrez Ioime) ===
 ${cvText}
@@ -74,15 +135,13 @@ ${cvText}
 === OFERTA LABORAL ===
 ${ofertaBlock(job)}
 
-La carta debe:
-- Tener 3–4 párrafos bien estructurados, con un tono profesional pero cercano y auténtico.
-- Abrirse conectando directamente la experiencia en Corrugadora Centro S.A. con los requisitos del puesto.
-- Destacar la capacidad de automatización de procesos y el trabajo con sistemas ERP como diferenciadores clave.
-- Mostrar motivación genuina y conocimiento del tipo de empresa o industria.
-- Cerrar con un llamado a la acción claro (solicitar entrevista / disponibilidad de contacto).
-- Evitar frases genéricas, clichés y el uso de "soy una persona".
+Analizá la oferta y devolvé **únicamente** las siguientes dos opciones de mensajes listos para rellenar (con marcadores entre corchetes como [Nombre del Recruiter] si aplica):
 
-Devolvé únicamente el texto de la carta, listo para copiar y pegar.`;
+### Opción 1: Versión para Email (Directo al grano - Máx. 3 párrafos cortos)
+[Escribí un asunto magnético y un cuerpo de mail que enganche en los primeros 5 segundos. Debe abrir saludando, conectar un logro o enfoque actual en Corrugadora Centro S.A. con la necesidad de la oferta, mencionar la combinación de automatización + ERP como tu diferencial, y cerrar invitando a ver el CV adjunto con un llamado a la acción limpio].
+
+### Opción 2: Versión para LinkedIn (Mensaje corto de red / InMail - Máx. 100 palabras)
+[Un mensaje ultra-compacto, ideal para leer desde el celular en una pantalla. Va directo al motivo del contacto, destaca el match técnico principal y propone una breve charla].`;
 }
 
 // ── Filename helpers ─────────────────────────────────────────────────────────
