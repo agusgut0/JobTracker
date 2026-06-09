@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Tracker · Agustín</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+
+  <div class="app-container">
+
+    <!-- HEADER -->
+    <header class="app-header">
+      <h1 class="app-title">Job Tracker</h1>
+      <p class="app-subtitle">Agustín Thomas Gutiérrez Ioime · Ing. Sistemas UTN</p>
+    </header>
+
+    <!-- NAV TABS -->
+    <nav class="tab-nav" role="tablist">
+      <button class="tab-btn active" role="tab" data-tab="busquedas" aria-selected="true">🔍 Búsquedas</button>
+      <button class="tab-btn" role="tab" data-tab="aplicaciones" aria-selected="false">📋 Aplicaciones</button>
+      <button class="tab-btn" role="tab" data-tab="micv" aria-selected="false">👤 Mi CV</button>
+    </nav>
+
+    <main class="tab-panels">
+
+      <!-- TAB: BÚSQUEDAS -->
+      <section id="tab-busquedas" class="tab-panel active" role="tabpanel">
+
+        <div class="card">
+          <h2 class="card-title">Seleccioná un rol</h2>
+          <div class="role-tabs" id="roleTabs"></div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">🌐 Grupo A — Via Google (site:)</h2>
+          <div class="btn-grid" id="groupA"></div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">🎯 Grupo B — Plataformas Directas</h2>
+          <div class="btn-grid" id="groupB"></div>
+        </div>
+
+      </section>
+
+      <!-- TAB: APLICACIONES -->
+      <section id="tab-aplicaciones" class="tab-panel" role="tabpanel">
+
+        <!-- STATS -->
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card"><span class="stat-num" id="sTot">0</span><span class="stat-lbl">Total</span></div>
+          <div class="stat-card"><span class="stat-num" id="sPen">0</span><span class="stat-lbl">Pendientes</span></div>
+          <div class="stat-card"><span class="stat-num" id="sApl">0</span><span class="stat-lbl">Aplicadas</span></div>
+          <div class="stat-card"><span class="stat-num" id="sEnt">0</span><span class="stat-lbl">Entrevistas</span>
+          </div>
+        </div>
+
+        <!-- FORM -->
+        <div class="card">
+          <h2 class="card-title">➕ Nueva oferta</h2>
+          <form id="offerForm" novalidate>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="fPuesto">Puesto *</label>
+                <input id="fPuesto" name="puesto" type="text" placeholder="Analista Funcional" required />
+              </div>
+              <div class="form-group">
+                <label for="fEmpresa">Empresa *</label>
+                <input id="fEmpresa" name="empresa" type="text" placeholder="Nombre empresa" required />
+              </div>
+              <div class="form-group full">
+                <label for="fLink">Link de la oferta</label>
+                <input id="fLink" name="link" type="url" placeholder="https://..." />
+              </div>
+              <div class="form-group full">
+                <label for="fDesc">Descripción / Requisitos</label>
+                <textarea id="fDesc" name="desc" placeholder="Pegá la descripción del puesto acá..."></textarea>
+              </div>
+              <div class="form-group">
+                <label for="fEstado">Estado</label>
+                <select id="fEstado" name="estado">
+                  <option value="pendiente">🟠 Pendiente</option>
+                  <option value="aplicada">🟢 Aplicada</option>
+                  <option value="entrevista">🔵 Entrevista</option>
+                  <option value="descartada">🔴 Descartada</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn-primary">Guardar oferta</button>
+          </form>
+        </div>
+
+        <!-- OFFER LIST -->
+        <div id="offerList"></div>
+
+      </section>
+
+      <!-- TAB: MI CV -->
+      <section id="tab-micv" class="tab-panel" role="tabpanel">
+
+        <div class="card">
+          <h2 class="card-title">📄 CV Principal (ES)</h2>
+          <p class="hint-text">✏️ Editable en tiempo real. Cada cambio se guarda automáticamente.</p>
+          <textarea id="cvMain" class="cv-textarea" spellcheck="false"></textarea>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">💾 Backup de datos</h2>
+          <p class="hint-text">Los datos persisten en tu navegador (localStorage). Usá el backup JSON como respaldo
+            externo.</p>
+          <button id="btnExport" class="btn-export">📥 Exportar JSON</button>
+          <button id="btnImportTrigger" class="btn-import">📤 Importar JSON</button>
+          <input type="file" id="importFile" accept=".json" hidden />
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- MODAL: CONFIRM DELETE -->
+  <div id="modalDelete" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalDeleteTitle" hidden>
+    <div class="modal">
+      <h3 id="modalDeleteTitle" class="modal-title">¿Eliminar oferta?</h3>
+      <p class="modal-body">Esta acción no se puede deshacer.</p>
+      <div class="modal-actions">
+        <button id="modalCancelBtn" class="btn-modal-cancel">Cancelar</button>
+        <button id="modalConfirmBtn" class="btn-modal-confirm">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+
+</html>
