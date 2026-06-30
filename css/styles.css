@@ -145,6 +145,42 @@ body {
 }
 
 /* ── ROLE TABS ───────────────────────────────────────────────── */
+.role-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.role-input-row input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: .8rem;
+  transition: border-color var(--transition);
+  height: 38px;
+}
+
+.role-input-row input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.role-input-row button {
+  width: auto;
+  margin-top: 0;
+  padding: 8px 16px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
 .role-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -152,6 +188,9 @@ body {
 }
 
 .role-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 5px 12px;
   border-radius: 20px;
   border: 1.5px solid var(--border);
@@ -168,6 +207,26 @@ body {
   border-color: var(--accent);
   background: var(--accent-light);
   color: var(--accent);
+}
+
+.role-delete {
+  margin-left: 2px;
+  font-weight: bold;
+  font-size: 1rem;
+  color: var(--text-3);
+  transition: color var(--transition);
+  line-height: 1;
+}
+
+.role-delete:hover {
+  color: #ff4a4a;
+}
+
+.empty-roles-hint {
+  font-size: .75rem;
+  color: var(--text-3);
+  margin: 4px 0;
+  font-style: italic;
 }
 
 /* ── SEARCH BUTTONS ──────────────────────────────────────────── */
@@ -256,6 +315,12 @@ label {
   font-size: .72rem;
   font-weight: 600;
   color: var(--text-2);
+}
+
+.optional-tag {
+  font-weight: 400;
+  color: var(--text-3);
+  font-style: italic;
 }
 
 input, select, textarea {

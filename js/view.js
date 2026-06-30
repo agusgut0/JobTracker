@@ -4,42 +4,18 @@
  * Exposes bindXxx() methods so the Controller can attach listeners.
  */
 
-import { docFilename } from './utils/prompts.js';
 
 // ── Platform data (presentation concern) ────────────────────────────────────
-const ROLES = [
-  {
-    id: 'analista', label: 'Analista Funcional / Sistemas',
-    queries: ['analista funcional sistemas', 'analista de sistemas información', 'functional analyst ERP'],
-  },
-  {
-    id: 'soporte', label: 'Soporte IT / Aplicaciones',
-    queries: ['soporte IT aplicaciones', 'helpdesk sistemas soporte', 'IT support analyst'],
-  },
-  {
-    id: 'erp', label: 'ERP / Automatización',
-    queries: ['especialista ERP implementación', 'analista ERP Totvs sistemas', 'ERP automation analyst'],
-  },
-];
-
-const PLATFORMS_A = [
-  { name: 'Greenhouse',      ico: '🌱', domain: 'boards.greenhouse.io' },
-  { name: 'Ashby',           ico: '📐', domain: 'jobs.ashbyhq.com' },
-  { name: 'Lever',           ico: '⚙️', domain: 'jobs.lever.co' },
-  { name: 'SmartRecruiters', ico: '🎯', domain: 'jobs.smartrecruiters.com' },
-  { name: 'Workday',         ico: '🏢', domain: 'myworkdayjobs.com' },
-  { name: 'BambooHR',        ico: '🎋', domain: 'bamboohr.com/careers' },
-  { name: 'Workable',        ico: '💼', domain: 'apply.workable.com' },
-];
-
-const PLATFORMS_B = [
-  { name: 'LinkedIn',     ico: '💼', url: q => `https://www.linkedin.com/jobs/search/?keywords=${enc(q)}&location=C%C3%B3rdoba%2C+Argentina&f_WT=2%2C1` },
-  { name: 'Indeed',       ico: '🔍', url: q => `https://ar.indeed.com/jobs?q=${enc(q)}&l=C%C3%B3rdoba&remotejob=032b3046-06a3-4876-8dfd-474eb5e7ed11` },
-  { name: 'Workana',      ico: '🖥️', url: q => `https://www.workana.com/jobs?language=es&search=${enc(q)}&country=AR` },
-  { name: 'Torre.ai',     ico: '🗼', url: q => `https://torre.ai/jobs?query=${enc(q)}&locationName=C%C3%B3rdoba,+Argentina` },
-  { name: 'Wellfound',    ico: '🚀', url: q => `https://wellfound.com/jobs?q=${enc(q)}&remote=true` },
-  { name: 'Bumeran',      ico: '🟡', url: q => `https://www.bumeran.com.ar/empleos-busqueda-${encodeURIComponent(q.replace(/ /g, '-'))}.html?provincia=cordoba` },
-  { name: 'Computrabajo', ico: '🔶', url: q => `https://ar.computrabajo.com/trabajo-de-${encodeURIComponent(q.replace(/ /g, '-'))}?l=C%C3%B3rdoba` },
+const PLATFORMS = [
+  { name: 'LinkedIn',       ico: '💼', url: q => `https://www.linkedin.com/jobs/search/?keywords=${enc(q)}&location=Argentina&f_WT=2%2C1` },
+  { name: 'Indeed',         ico: '🔍', url: q => `https://ar.indeed.com/jobs?q=${enc(q)}&l=Argentina&remotejob=032b3046-06a3-4876-8dfd-474eb5e7ed11` },
+  { name: 'Get on Board',   ico: '🚀', url: q => `https://www.getonbrd.com/jobs?q=${enc(q)}&country_id=Argentina` },
+  { name: 'Chumi IT',       ico: '🤖', url: q => `https://chumi-it.com/empleos?q=${enc(q)}` },
+  { name: 'x64',            ico: '💻', url: q => `https://x64.ar/?q=${enc(q)}` },
+  { name: 'Revista Empleo', ico: '📰', url: _q => `https://www.revistaempleo.com/todos-los-trabajos/` },
+  { name: 'EPAM Campus',    ico: '🎓', url: _q => `https://campus.epam.com/en` },
+  { name: 'EmpleosIT',      ico: '🔶', url: q => `https://www.empleosit.com.ar/search?q=${enc(q)}` },
+  { name: 'Andeshire',      ico: '🏔️', url: _q => `https://andeshire.com/` },
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -55,6 +31,22 @@ const ESTADO_LABELS = {
   descartada: '🔴 Descartada',
 };
 
+// ── CV field IDs (maps to cvData keys) ──────────────────────────────────────
+const CV_FIELDS = [
+  { id: 'cvNombre',            key: 'nombre' },
+  { id: 'cvRol',               key: 'rol' },
+  { id: 'cvEmail',             key: 'email' },
+  { id: 'cvTelefono',          key: 'telefono' },
+  { id: 'cvLinkedin',          key: 'linkedin' },
+  { id: 'cvPortfolio',         key: 'portfolio' },
+  { id: 'cvResumen',           key: 'resumen' },
+  { id: 'cvExperiencia',       key: 'experiencia' },
+  { id: 'cvHabilidadesTec',    key: 'habilidadesTec' },
+  { id: 'cvFormacion',         key: 'formacion' },
+  { id: 'cvHabilidadesBlandas',key: 'habilidadesBlandas' },
+  { id: 'cvIdiomas',           key: 'idiomas' },
+];
+
 // ── DOM cache ────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 
@@ -64,7 +56,8 @@ const el = {
   tabPanels:      () => document.querySelectorAll('.tab-panel'),
   // Search tab
   roleTabs:       $('roleTabs'),
-  groupA:         $('groupA'),
+  roleInput:      $('roleInput'),
+  btnAddRole:     $('btnAddRole'),
   groupB:         $('groupB'),
   // Stats
   sTot:           $('sTot'),
@@ -80,12 +73,26 @@ const el = {
   fEstado:        $('fEstado'),
   // Offer list
   offerList:      $('offerList'),
-  // CV
-  cvMain:         $('cvMain'),
-  // Backup
+  // CV fields
+  cvNombre:           $('cvNombre'),
+  cvRol:              $('cvRol'),
+  cvEmail:            $('cvEmail'),
+  cvTelefono:         $('cvTelefono'),
+  cvLinkedin:         $('cvLinkedin'),
+  cvPortfolio:        $('cvPortfolio'),
+  cvResumen:          $('cvResumen'),
+  cvExperiencia:      $('cvExperiencia'),
+  cvHabilidadesTec:   $('cvHabilidadesTec'),
+  cvFormacion:        $('cvFormacion'),
+  cvHabilidadesBlandas:$('cvHabilidadesBlandas'),
+  cvIdiomas:          $('cvIdiomas'),
+  // Header subtitle
+  appSubtitle:    $('appSubtitle'),
+  // Backup & Download
   btnExport:      $('btnExport'),
   btnImportTrig:  $('btnImportTrigger'),
   importFile:     $('importFile'),
+  btnDownloadCV:  $('btnDownloadCV'),
   // Modal
   modalDelete:    $('modalDelete'),
   modalCancel:    $('modalCancelBtn'),
@@ -116,30 +123,32 @@ function switchTab(targetId) {
   });
 }
 
-// ── Search buttons ───────────────────────────────────────────────────────────
-function renderRoleTabs(activeRoleId) {
-  el.roleTabs.innerHTML = ROLES.map(r =>
-    `<button class="role-tab${r.id === activeRoleId ? ' active' : ''}" data-role="${r.id}">${r.label}</button>`
+// ── Role tabs (dynamic) ─────────────────────────────────────────────────────
+function renderRoleTabs(roles, activeRoleId) {
+  if (!roles.length) {
+    el.roleTabs.innerHTML = `<p class="empty-roles-hint">No hay roles agregados. Escribí uno arriba para empezar.</p>`;
+    return;
+  }
+  el.roleTabs.innerHTML = roles.map(r =>
+    `<button class="role-tab${r.id === activeRoleId ? ' active' : ''}" data-role="${r.id}">
+      ${esc(r.label)}
+      <span class="role-delete" data-role-del="${r.id}" title="Eliminar rol">×</span>
+    </button>`
   ).join('');
 }
 
-function renderSearchButtons(activeRoleId) {
-  const qs = ROLES.find(r => r.id === activeRoleId)?.queries ?? ROLES[0].queries;
+// ── Search buttons ───────────────────────────────────────────────────────────
+function renderSearchButtons(query) {
+  const qVal = (query || '').trim();
 
-  el.groupA.innerHTML = PLATFORMS_A.map((p, i) => {
-    const url = `https://www.google.com/search?q=site:${p.domain}+${enc(qs[i % 3])}`;
+  el.groupB.innerHTML = PLATFORMS.map(p => {
+    const url = p.url(qVal);
+    const subText = qVal ? `Buscar: ${esc(qVal)}` : 'Ver plataforma';
     return `<a class="search-btn" href="${url}" target="_blank" rel="noopener noreferrer">
       <span class="ico">${p.ico}</span>
-      <span class="lbl">${esc(p.name)}<span class="sub">via Google site:</span></span>
+      <span class="lbl">${esc(p.name)}<span class="sub">${subText}</span></span>
     </a>`;
   }).join('');
-
-  el.groupB.innerHTML = PLATFORMS_B.map((p, i) =>
-    `<a class="search-btn" href="${p.url(qs[i % 3])}" target="_blank" rel="noopener noreferrer">
-      <span class="ico">${p.ico}</span>
-      <span class="lbl">${esc(p.name)}<span class="sub">Córdoba + Remoto</span></span>
-    </a>`
-  ).join('');
 }
 
 // ── Stats ────────────────────────────────────────────────────────────────────
@@ -198,32 +207,6 @@ function renderOffers(jobs) {
           <button class="btn-ai cv    js-ai" data-id="${job.id}" data-type="cv">✦ Adaptar CV</button>
           <button class="btn-ai carta js-ai" data-id="${job.id}" data-type="carta">✦ Crear Carta</button>
         </div>
-
-        <!-- CV paste area -->
-        <div class="paste-area" id="paste-cv-${job.id}">
-          <p class="paste-steps">
-            1. Prompt copiado ✓ Pegalo en tu IA favorita.<br>
-            2. Cuando la IA responda, pegá el CV adaptado acá para descargarlo:
-          </p>
-          <textarea class="paste-textarea" id="result-cv-${job.id}"
-            placeholder="Pegá acá el CV adaptado por la IA..."></textarea>
-          <button class="btn-download js-download" data-id="${job.id}" data-doc="cv">
-            📥 Descargar CV (.doc)
-          </button>
-        </div>
-
-        <!-- Carta paste area -->
-        <div class="paste-area" id="paste-carta-${job.id}">
-          <p class="paste-steps">
-            1. Prompt copiado ✓ Pegalo en tu IA favorita.<br>
-            2. Cuando la IA responda, pegá la carta acá para descargarla:
-          </p>
-          <textarea class="paste-textarea" id="result-carta-${job.id}"
-            placeholder="Pegá acá la carta generada por la IA..."></textarea>
-          <button class="btn-download js-download" data-id="${job.id}" data-doc="carta">
-            📥 Descargar Carta (.doc)
-          </button>
-        </div>
       </div>
     </article>
   `).join('');
@@ -234,49 +217,34 @@ function toggleDesc(id) {
   document.getElementById(`desc-${id}`)?.classList.toggle('expanded');
 }
 
-// ── Toggle paste area ─────────────────────────────────────────────────────────
-function togglePasteArea(jobId, docType) {
-  const target = document.getElementById(`paste-${docType}-${jobId}`);
-  if (!target) return;
-  // Close the other area in the same card first
-  const card = document.getElementById(`oc-${jobId}`);
-  card.querySelectorAll('.paste-area.open').forEach(a => {
-    if (a !== target) a.classList.remove('open');
+// ── CV form: populate fields ──────────────────────────────────────────────────
+function setCVData(cvData) {
+  CV_FIELDS.forEach(({ id, key }) => {
+    const field = el[id];
+    if (field) field.value = cvData[key] || '';
   });
-  target.classList.toggle('open');
+  // Update header subtitle dynamically
+  updateSubtitle(cvData);
 }
 
-// ── Download .doc ─────────────────────────────────────────────────────────────
-function downloadDoc(jobId, docType, empresa) {
-  const taId   = `result-${docType}-${jobId}`;
-  const text   = document.getElementById(taId)?.value.trim() ?? '';
-  if (!text) { showToast('⚠️ Primero pegá la respuesta de la IA en el campo.'); return; }
-
-  // Wrap in minimal RTF so Word opens it cleanly
-  const rtfBody = text
-    .replace(/\\/g, '\\\\')
-    .replace(/\{/g, '\\{')
-    .replace(/\}/g, '\\}')
-    .split('\n').join('\\line\n');
-
-  const rtf = `{\\rtf1\\ansi\\deff0\n{\\fonttbl{\\f0\\fnil\\fcharset0 Calibri;}}\n\\widowctrl\\wpaper12240\\wpapr9790\\margl1800\\margr1800\\margt1440\\margb1440\n\\f0\\fs22 ${rtfBody}\n}`;
-
-  const blob = new Blob([rtf], { type: 'application/msword' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = docFilename(empresa, docType);
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-
-  showToast(`📄 ${a.download} descargado.`);
+// ── Update header subtitle from CV data ──────────────────────────────────────
+function updateSubtitle(cvData) {
+  const parts = [];
+  if (cvData.nombre) parts.push(cvData.nombre);
+  if (cvData.rol) parts.push(cvData.rol);
+  el.appSubtitle.textContent = parts.length
+    ? parts.join(' · ')
+    : 'Tu asistente de búsqueda laboral';
 }
 
-// ── CV textarea ───────────────────────────────────────────────────────────────
-function setCVText(text) {
-  el.cvMain.value = text;
+// ── Collect CV data from form ────────────────────────────────────────────────
+function collectCVData() {
+  const data = {};
+  CV_FIELDS.forEach(({ id, key }) => {
+    const field = el[id];
+    if (field) data[key] = field.value;
+  });
+  return data;
 }
 
 // ── Form reset ────────────────────────────────────────────────────────────────
@@ -298,8 +266,29 @@ function bindTabNav(handler) {
 
 function bindRoleTabs(handler) {
   el.roleTabs.addEventListener('click', e => {
+    // Delete role
+    const delBtn = e.target.closest('[data-role-del]');
+    if (delBtn) {
+      handler.deleteRole(Number(delBtn.dataset.roleDel));
+      return;
+    }
+    // Select role
     const btn = e.target.closest('.role-tab');
-    if (btn) handler(btn.dataset.role);
+    if (btn) handler.selectRole(Number(btn.dataset.role));
+  });
+}
+
+function bindAddRole(handler) {
+  const submit = () => {
+    const val = el.roleInput.value.trim();
+    if (val) {
+      handler(val);
+      el.roleInput.value = '';
+    }
+  };
+  el.btnAddRole.addEventListener('click', submit);
+  el.roleInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); submit(); }
   });
 }
 
@@ -329,10 +318,6 @@ function bindOfferList(handlers) {
     // AI buttons
     const aiBtn = e.target.closest('.js-ai');
     if (aiBtn) { handlers.aiAction(Number(aiBtn.dataset.id), aiBtn.dataset.type); return; }
-
-    // Download button
-    const dlBtn = e.target.closest('.js-download');
-    if (dlBtn) { handlers.download(Number(dlBtn.dataset.id), dlBtn.dataset.doc); return; }
   });
 
   el.offerList.addEventListener('change', e => {
@@ -342,7 +327,29 @@ function bindOfferList(handlers) {
 }
 
 function bindCVInput(handler) {
-  el.cvMain.addEventListener('input', () => handler(el.cvMain.value));
+  // Listen on each CV field for real-time save
+  CV_FIELDS.forEach(({ id }) => {
+    const field = el[id];
+    if (field) {
+      field.addEventListener('input', () => {
+        // Phone validation: strip invalid chars in real time
+        if (id === 'cvTelefono') {
+          const pos = field.selectionStart;
+          const cleaned = field.value.replace(/[^+0-9]/g, '');
+          if (cleaned !== field.value) {
+            field.value = cleaned;
+            field.setSelectionRange(pos - 1, pos - 1);
+          }
+        }
+        const data = collectCVData();
+        handler(data);
+      });
+    }
+  });
+}
+
+function bindDownloadCV(handler) {
+  el.btnDownloadCV.addEventListener('click', handler);
 }
 
 function bindExport(handler) {
@@ -376,22 +383,23 @@ export default {
   renderSearchButtons,
   renderStats,
   renderOffers,
-  setCVText,
+  setCVData,
   resetForm,
   // Interaction helpers
   switchTab,
   toggleDesc,
-  togglePasteArea,
-  downloadDoc,
   showToast,
   openDeleteModal,
   closeDeleteModal,
+  updateSubtitle,
   // Event binders
   bindTabNav,
   bindRoleTabs,
+  bindAddRole,
   bindOfferForm,
   bindOfferList,
   bindCVInput,
+  bindDownloadCV,
   bindExport,
   bindImport,
   bindModalCancel,

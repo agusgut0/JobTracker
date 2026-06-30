@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Job Tracker · Agustín</title>
+  <title>Job Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -20,7 +20,7 @@
     <!-- HEADER -->
     <header class="app-header">
       <h1 class="app-title">Job Tracker</h1>
-      <p class="app-subtitle">Agustín Thomas Gutiérrez Ioime · Ing. Sistemas UTN</p>
+      <p class="app-subtitle" id="appSubtitle">Tu asistente de búsqueda laboral</p>
     </header>
 
     <!-- NAV TABS -->
@@ -36,17 +36,22 @@
       <section id="tab-busquedas" class="tab-panel active" role="tabpanel">
 
         <div class="card">
-          <h2 class="card-title">Seleccioná un rol</h2>
+          <h2 class="card-title">➕ Agregar rol de interés</h2>
+          <p class="hint-text">Escribí un rol técnico que te interese buscar (ej: Desarrollador Frontend, Analista QA).</p>
+          <div class="role-input-row" id="roleInputRow">
+            <input id="roleInput" type="text" placeholder="Ej: Analista Funcional" />
+            <button id="btnAddRole" class="btn-primary btn-sm">+ Agregar</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">🏷️ Roles Activos</h2>
+          <p class="hint-text">Seleccioná un rol para filtrar las plataformas de búsqueda.</p>
           <div class="role-tabs" id="roleTabs"></div>
         </div>
 
         <div class="card">
-          <h2 class="card-title">🌐 Grupo A — Via Google (site:)</h2>
-          <div class="btn-grid" id="groupA"></div>
-        </div>
-
-        <div class="card">
-          <h2 class="card-title">🎯 Grupo B — Plataformas Directas</h2>
+          <h2 class="card-title">🎯 Plataformas de Búsqueda</h2>
           <div class="btn-grid" id="groupB"></div>
         </div>
 
@@ -108,9 +113,69 @@
       <section id="tab-micv" class="tab-panel" role="tabpanel">
 
         <div class="card">
-          <h2 class="card-title">📄 CV Principal (ES)</h2>
+          <h2 class="card-title">📄 Mi perfil profesional</h2>
           <p class="hint-text">✏️ Editable en tiempo real. Cada cambio se guarda automáticamente.</p>
-          <textarea id="cvMain" class="cv-textarea" spellcheck="false"></textarea>
+          <div class="form-grid" id="cvForm">
+            <div class="form-group">
+              <label for="cvNombre">Nombre y Apellido *</label>
+              <input id="cvNombre" type="text" placeholder="Ej: María López" />
+            </div>
+            <div class="form-group">
+              <label for="cvRol">Puesto o Rol *</label>
+              <input id="cvRol" type="text" placeholder="Ej: Analista de Sistemas" />
+            </div>
+            <div class="form-group">
+              <label for="cvEmail">Email *</label>
+              <input id="cvEmail" type="email" placeholder="nombre@email.com" />
+            </div>
+            <div class="form-group">
+              <label for="cvTelefono">Teléfono *</label>
+              <input id="cvTelefono" type="tel" pattern="^\+?[0-9]*$" placeholder="+54 9 351 ..." />
+            </div>
+            <div class="form-group">
+              <label for="cvLinkedin">LinkedIn <span class="optional-tag">(opcional)</span></label>
+              <input id="cvLinkedin" type="url" placeholder="https://linkedin.com/in/..." />
+            </div>
+            <div class="form-group">
+              <label for="cvPortfolio">Portfolio <span class="optional-tag">(opcional)</span></label>
+              <input id="cvPortfolio" type="url" placeholder="https://..." />
+            </div>
+            <div class="form-group full">
+              <label for="cvResumen">Resumen profesional</label>
+              <textarea id="cvResumen" spellcheck="false"
+                placeholder="Breve párrafo que resuma tu perfil, experiencia y valor diferencial..."></textarea>
+            </div>
+            <div class="form-group full">
+              <label for="cvExperiencia">Experiencia laboral</label>
+              <textarea id="cvExperiencia" class="cv-textarea" spellcheck="false"
+                placeholder="Describí tus experiencias laborales, roles, empresas, logros..."></textarea>
+            </div>
+            <div class="form-group full">
+              <label for="cvHabilidadesTec">Habilidades técnicas</label>
+              <textarea id="cvHabilidadesTec" spellcheck="false"
+                placeholder="Ej: Python, JavaScript, SQL, ERP Totvs..."></textarea>
+            </div>
+            <div class="form-group full">
+              <label for="cvFormacion">Formación académica</label>
+              <textarea id="cvFormacion" spellcheck="false"
+                placeholder="Ej: Ingeniería en Sistemas — UTN (2021 - Actualidad)..."></textarea>
+            </div>
+            <div class="form-group full">
+              <label for="cvHabilidadesBlandas">Habilidades blandas</label>
+              <textarea id="cvHabilidadesBlandas" spellcheck="false"
+                placeholder="Ej: Trabajo en equipo, comunicación, resolución de problemas..."></textarea>
+            </div>
+            <div class="form-group full">
+              <label for="cvIdiomas">Idiomas</label>
+              <input id="cvIdiomas" type="text" placeholder="Ej: Español nativo, Inglés B2" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">📄 Descargar CV</h2>
+          <p class="hint-text">Generá un archivo .docx con tus datos usando la plantilla profesional integrada.</p>
+          <button id="btnDownloadCV" class="btn-export">📄 Descargar Mi CV (.docx)</button>
         </div>
 
         <div class="card">
@@ -142,6 +207,8 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.7/pizzip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <script type="module" src="js/app.js"></script>
 </body>
 

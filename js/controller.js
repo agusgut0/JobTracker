@@ -9,7 +9,8 @@ import View  from './view.js';
 import { promptFIT, promptAdaptarCV, promptCarta } from './utils/prompts.js';
 
 // ── Internal state (UI-only, not persisted) ───────────────────────────────────
-let activeRole   = 'analista';
+// ── Internal state (UI-only, not persisted) ───────────────────────────────────
+let activeRoleId = null;         // selected role ID
 let pendingDelete = null;        // job id awaiting confirmation
 
 // ── Clipboard helper ──────────────────────────────────────────────────────────
@@ -34,16 +35,46 @@ function refreshJobs() {
   View.renderOffers(Model.getJobs());
 }
 
+function refreshRoles() {
+  const roles = Model.getRoles();
+  const activeRole = roles.find(r => r.id === activeRoleId);
+  View.renderRoleTabs(roles, activeRoleId);
+  View.renderSearchButtons(activeRole ? activeRole.label : null);
+}
+
 // ── Handlers ──────────────────────────────────────────────────────────────────
 
 function onTabNav(tabId) {
   View.switchTab(tabId);
 }
 
-function onRoleSelect(roleId) {
-  activeRole = roleId;
-  View.renderRoleTabs(activeRole);
-  View.renderSearchButtons(activeRole);
+const roleHandlers = {
+  selectRole(id) {
+    activeRoleId = id;
+    refreshRoles();
+  },
+  deleteRole(id) {
+    Model.deleteRole(id);
+    if (activeRoleId === id) {
+      const roles = Model.getRoles();
+      activeRoleId = roles.length ? roles[0].id : null;
+    }
+    refreshRoles();
+    View.showToast('Rol eliminado.');
+  }
+};
+
+function onAddRole(label) {
+  const newRole = Model.addRole(label);
+  if (newRole) {
+    if (activeRoleId === null) {
+      activeRoleId = newRole.id;
+    }
+    refreshRoles();
+    View.showToast('Rol agregado correctamente.');
+  } else {
+    View.showToast('⚠️ Este rol ya existe.');
+  }
 }
 
 function onOfferSubmit(formData) {
@@ -87,7 +118,7 @@ function onModalConfirm() {
 
 async function onAIAction(jobId, type) {
   const job    = Model.getJobs().find(j => j.id === jobId);
-  const cvText = Model.getCVText();
+  const cvData = Model.getCVData();
   if (!job) return;
 
   let prompt = '';
@@ -95,18 +126,16 @@ async function onAIAction(jobId, type) {
 
   switch (type) {
     case 'fit':
-      prompt   = promptFIT(job, cvText);
+      prompt   = promptFIT(job, cvData);
       toastMsg = '✦ Prompt de FIT copiado. ¡Pegalo en tu IA favorita!';
       break;
     case 'cv':
-      prompt   = promptAdaptarCV(job, cvText);
-      toastMsg = '✦ Prompt de CV copiado. Pegalo en tu IA y luego el resultado en el campo de abajo.';
-      View.togglePasteArea(jobId, 'cv');
+      prompt   = promptAdaptarCV(job, cvData);
+      toastMsg = '✦ Prompt de CV copiado. ¡Pegalo en tu IA favorita!';
       break;
     case 'carta':
-      prompt   = promptCarta(job, cvText);
-      toastMsg = '✦ Prompt de carta copiado. Pegalo en tu IA y luego el resultado en el campo de abajo.';
-      View.togglePasteArea(jobId, 'carta');
+      prompt   = promptCarta(job, cvData);
+      toastMsg = '✦ Prompt de carta copiado. ¡Pegalo en tu IA favorita!';
       break;
     default:
       return;
@@ -116,18 +145,13 @@ async function onAIAction(jobId, type) {
   View.showToast(toastMsg);
 }
 
-function onDownload(jobId, docType) {
-  const job = Model.getJobs().find(j => j.id === jobId);
-  if (!job) return;
-  View.downloadDoc(jobId, docType, job.empresa);
-}
-
 function onToggleDesc(id) {
   View.toggleDesc(id);
 }
 
-function onCVInput(newText) {
-  Model.editCV(newText);
+function onCVInput(cvData) {
+  Model.editCV(cvData);
+  View.updateSubtitle(cvData);
 }
 
 function onExport() {
@@ -141,11 +165,102 @@ function onExport() {
 async function onImport(file) {
   try {
     const { jobCount } = await Model.importJSON(file);
-    View.setCVText(Model.getCVText());
+    View.setCVData(Model.getCVData());
     refreshJobs();
     View.showToast(`📤 Importación exitosa: ${jobCount} oferta(s) restauradas.`);
   } catch {
     View.showToast('⚠️ No se pudo leer el archivo. ¿Es un JSON válido?');
+  }
+}
+
+async function onDownloadCV() {
+  const cv = Model.getCVData();
+  if (!cv.nombre) {
+    View.showToast('⚠️ Completá al menos tu Nombre y Apellido para descargar el CV.');
+    return;
+  }
+
+  try {
+    const response = await fetch('js/utils/PlantillaCV.docx');
+    if (!response.ok) throw new Error('No se pudo cargar la plantilla');
+    const arrayBuffer = await response.arrayBuffer();
+
+    // Load the DOCX as a zip
+    const zip = new PizZip(arrayBuffer);
+
+    // Get the document.xml content
+    const docXml = zip.file('word/document.xml');
+    if (!docXml) throw new Error('Plantilla inválida');
+    let content = docXml.asText();
+
+    // Replace template placeholders in the XML
+    // The template uses [Tag] style placeholders but Word may split them across XML runs.
+    // We do a two-pass approach: first try direct replacement, then handle split tags.
+    const replacements = {
+      'Nombre y Apellido': cv.nombre || '',
+      'Puesto o Rol':      cv.rol || '',
+      'Email':             cv.email || '',
+      'Teléfono':          cv.telefono || '',
+      'LinkedIn':          cv.linkedin || '',
+      'Porfolio':          cv.portfolio || '',   // Note: template has typo "Porfolio"
+      'Portfolio':         cv.portfolio || '',
+      'Perfil profesional':cv.resumen || '',
+      'Experiencia laboral':cv.experiencia || '',
+      'Habilidades técnicas':cv.habilidadesTec || '',
+      'Formación académica':cv.formacion || '',
+      'Habilidades blandas':cv.habilidadesBlandas || '',
+      'Idiomas':           cv.idiomas || '',
+    };
+
+    // First: clean up split runs in the XML so placeholders become contiguous
+    // This regex finds text within <w:t> tags and concatenates split bracket placeholders
+    content = content.replace(
+      /\[(<\/w:t><\/w:r>(?:<w:r[^>]*>)?(?:<w:rPr>.*?<\/w:rPr>)?<w:r[^>]*>(?:<w:rPr>.*?<\/w:rPr>)?<w:t[^>]*>)([^\]]*?)\]/g,
+      (match) => {
+        // Extract just the text content from the XML runs
+        const textOnly = match.replace(/<[^>]+>/g, '');
+        return textOnly;
+      }
+    );
+
+    // Now do simple text replacement for each placeholder
+    for (const [tag, value] of Object.entries(replacements)) {
+      // Escape XML special chars in the replacement value
+      const safeValue = value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+      
+      // Replace [Tag] with the value
+      const escaped = tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`\\[${escaped}\\]`, 'g');
+      content = content.replace(regex, safeValue);
+    }
+
+    // Write back the modified XML
+    zip.file('word/document.xml', content);
+
+    // Generate and download
+    const blob = zip.generate({
+      type: 'blob',
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    });
+
+    const slug = cv.nombre
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9\s]/g, '')
+      .trim()
+      .replace(/\s+/g, '_')
+      .substring(0, 40);
+
+    saveAs(blob, `CV_${slug}.docx`);
+    View.showToast('📄 CV descargado correctamente.');
+  } catch (err) {
+    console.error('Error generando CV:', err);
+    View.showToast('⚠️ Error al generar el CV. Revisá la consola para más detalles.');
   }
 }
 
@@ -154,16 +269,25 @@ export function init() {
   // 1. Hydrate model from localStorage
   Model.load();
 
+  // Load initial role state
+  const roles = Model.getRoles();
+  if (roles.length) {
+    activeRoleId = roles[0].id;
+  }
+
   // 2. Initial renders
-  View.renderRoleTabs(activeRole);
-  View.renderSearchButtons(activeRole);
+  const activeRole = roles.find(r => r.id === activeRoleId);
+  View.renderRoleTabs(roles, activeRoleId);
+  View.renderSearchButtons(activeRole ? activeRole.label : null);
+
   View.renderStats(Model.getStats());
   View.renderOffers(Model.getJobs());
-  View.setCVText(Model.getCVText());
+  View.setCVData(Model.getCVData());
 
   // 3. Wire events
   View.bindTabNav(onTabNav);
-  View.bindRoleTabs(onRoleSelect);
+  View.bindRoleTabs(roleHandlers);
+  View.bindAddRole(onAddRole);
   View.bindOfferForm(onOfferSubmit);
 
   View.bindOfferList({
@@ -171,10 +295,10 @@ export function init() {
     requestDelete: onRequestDelete,
     statusChange:  onStatusChange,
     aiAction:      onAIAction,
-    download:      onDownload,
   });
 
   View.bindCVInput(onCVInput);
+  View.bindDownloadCV(onDownloadCV);
   View.bindExport(onExport);
   View.bindImport(onImport);
   View.bindModalCancel(onModalCancel);

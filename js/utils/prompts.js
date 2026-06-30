@@ -1,6 +1,6 @@
 /**
  * UTILS / PROMPTS — Pure functions.
- * Each function receives job data + cvText and returns a prompt string.
+ * Each function receives job data + cvData (object) and returns a prompt string.
  * Zero side effects. Zero DOM access.
  */
 
@@ -17,11 +17,43 @@ Descripción / Requisitos:
 ${job.desc || '(sin descripción proporcionada)'}`.trim();
 }
 
+/**
+ * Formats the cvData object into a readable text block for AI prompts.
+ * @param {Object} cvData
+ * @returns {string}
+ */
+function formatCVForPrompt(cvData) {
+  const sections = [];
+
+  if (cvData.nombre)   sections.push(`NOMBRE: ${cvData.nombre}`);
+  if (cvData.rol)      sections.push(`ROL / PUESTO ACTUAL: ${cvData.rol}`);
+
+  // Contact info
+  const contactParts = [];
+  if (cvData.email)     contactParts.push(`Email: ${cvData.email}`);
+  if (cvData.telefono)  contactParts.push(`Teléfono: ${cvData.telefono}`);
+  if (cvData.linkedin)  contactParts.push(`LinkedIn: ${cvData.linkedin}`);
+  if (cvData.portfolio) contactParts.push(`Portfolio: ${cvData.portfolio}`);
+  if (contactParts.length) sections.push(`DATOS DE CONTACTO:\n${contactParts.join('\n')}`);
+
+  if (cvData.resumen)            sections.push(`RESUMEN PROFESIONAL:\n${cvData.resumen}`);
+  if (cvData.experiencia)        sections.push(`EXPERIENCIA LABORAL:\n${cvData.experiencia}`);
+  if (cvData.habilidadesTec)     sections.push(`HABILIDADES TÉCNICAS:\n${cvData.habilidadesTec}`);
+  if (cvData.formacion)          sections.push(`FORMACIÓN ACADÉMICA:\n${cvData.formacion}`);
+  if (cvData.habilidadesBlandas) sections.push(`HABILIDADES BLANDAS:\n${cvData.habilidadesBlandas}`);
+  if (cvData.idiomas)            sections.push(`IDIOMAS: ${cvData.idiomas}`);
+
+  return sections.join('\n\n');
+}
+
 // ── Prompt: Analizar FIT ─────────────────────────────────────────────────────
 /**
  * Full autonomous prompt for fit analysis (works in any AI).
  */
-export function promptFIT(job, cvText) {
+export function promptFIT(job, cvData) {
+  const candidateName = cvData.nombre || 'Candidato';
+  const cvBlock = formatCVForPrompt(cvData);
+
   return `Actuá como un Lead Technical Recruiter y experto en selección de talento IT de alta exigencia. Tu objetivo es realizar un screening objetivo, riguroso y libre de sesgos normativos, penalizando la falta de evidencia explícita en el CV.
 
 Analizá la compatibilidad entre el CV del candidato y la oferta laboral provista.
@@ -31,8 +63,8 @@ Analizá la compatibilidad entre el CV del candidato y la oferta laboral provist
 2. No asumas experiencia: La proximidad de un término no implica dominio. Evaluá según proyectos, años de uso o logros descritos.
 3. Justificación basada en datos: Cada fortaleza o brecha debe hacer referencia directa a una sección del CV o de la oferta.
 
-=== CV DEL CANDIDATO (Agustín Thomas Gutiérrez Ioime) ===
-${cvText}
+=== CV DEL CANDIDATO (${candidateName}) ===
+${cvBlock}
 
 === OFERTA LABORAL ===
 ${ofertaBlock(job)}
@@ -59,7 +91,10 @@ Respondé estrictamente con el siguiente formato Markdown, manteniendo un tono p
 /**
  * Full autonomous CV adaptation prompt (works in any AI).
  */
-export function promptAdaptarCV(job, cvText) {
+export function promptAdaptarCV(job, cvData) {
+  const candidateName = cvData.nombre || 'Candidato';
+  const cvBlock = formatCVForPrompt(cvData);
+
   return `Actuá como un experto en Redacción de CVs de Alto Impacto para el sector IT y especialista en optimización de algoritmos ATS (Applicant Tracking Systems). 
 
 Tu objetivo es adaptar de forma estratégica el CV del candidato para la oferta laboral provista, maximizando el "Keyword Match" sin caer en prácticas de spam y manteniendo la autenticidad del perfil.
@@ -69,8 +104,8 @@ Tu objetivo es adaptar de forma estratégica el CV del candidato para la oferta 
 2. LIMITACIÓN DE MÉTRICAS: Si el CV original no tiene métricas numéricas, no las inventes. En su lugar, usá la estructura de impacto: "Acción (Verbo) + Contexto Técnico + Resultado/Propósito" (Método XYZ de Google).
 3. TONO: Profesional, técnico, directo y orientado al logro. Evitá adjetivos vacíos como "motivado", "proactivo" o "apasionado".
 
-=== CV ORIGINAL (Agustín Thomas Gutiérrez Ioime) ===
-${cvText}
+=== CV ORIGINAL (${candidateName}) ===
+${cvBlock}
 
 === OFERTA LABORAL ===
 ${ofertaBlock(job)}
@@ -82,6 +117,7 @@ Analizá ambas fuentes y devolvé la información estructurada bajo el siguiente
 * **Estrategia de Descarte:** [Qué proyectos o tecnologías secundarias del CV original sugerís pasar a segundo plano o resumir para que no hagan "ruido" visual en esta postulación].
 
 ### 2. Resumen Profesional Optimizado (Máx. 4 líneas)
+TITULO: [Escribi el rol técnico del puesto solicitante haciendolo concordar con la experiencia del usuario]
 [Escribí un párrafo compacto que responda: Qué es (Rol técnico) + Cuánta experiencia/Seniority tiene + Stack principal relevante para la oferta + Mayor valor que aporta para resolver el problema de la empresa].
 
 ### 3. Core Skills Reordenadas
@@ -98,6 +134,7 @@ Analizá ambas fuentes y devolvé la información estructurada bajo el siguiente
 [Datos de contacto: Email | LinkedIn | Teléfono | Ubicación]
 
 ## Perfil profesional
+[Inserta el título del rol]
 [Insertar acá el párrafo del Resumen Profesional Optimizado generado en el punto 2].
 
 ## Experiencia Laboral
@@ -119,29 +156,36 @@ Analizá ambas fuentes y devolvé la información estructurada bajo el siguiente
 /**
  * Full autonomous cover letter prompt (works in any AI).
  */
-export function promptCarta(job, cvText) {
+export function promptCarta(job, cvData) {
+  const candidateName = cvData.nombre || 'Candidato';
+  const cvBlock = formatCVForPrompt(cvData);
+
   return `Actuá como un experto en Outbound Recruiting y Copywriting Profesional para el sector IT. 
 
 Tu objetivo es redactar un mensaje de contacto (Pitch de Enganche) hiperconciso, directo y de alto impacto para enviarle a un reclutador. El texto debe generar la curiosidad justa para que el reclutador desee abrir el CV adjunto o revisar el perfil del candidato, evitando repetir el CV entero en prosa.
 
 === REGLAS DE REDACCIÓN ===
 1. BREVEDAD ABSOLUTA: El mensaje no debe superar las 150 palabras en su versión de Email y debe ser extremadamente directo.
-2. ENFOQUE EN VALOR: En lugar de decir "tengo experiencia en X", redactalo como "en mi rol actual en Corrugadora Centro S.A. me enfoco en resolver [Problema clave de la oferta] mediante automatización y optimización de ERPs".
+2. ENFOQUE EN VALOR: En lugar de decir "tengo experiencia en X", redactalo como "en mi rol actual me enfoco en resolver [Problema clave de la oferta] mediante [habilidades/herramientas relevantes del candidato]".
 3. TONO: Profesional, moderno, fresco y al grano. Quedan prohibidos los saludos excesivamente formales (ej: "De mi mayor consideración", "Estimado/a señor/a") y las frases cliché.
 
-=== CV DEL CANDIDATO (Agustín Thomas Gutiérrez Ioime) ===
-${cvText}
+=== CV DEL CANDIDATO (${candidateName}) ===
+${cvBlock}
 
 === OFERTA LABORAL ===
 ${ofertaBlock(job)}
 
 Analizá la oferta y devolvé **únicamente** las siguientes dos opciones de mensajes listos para rellenar (con marcadores entre corchetes como [Nombre del Recruiter] si aplica):
 
-### Opción 1: Versión para Email (Directo al grano - Máx. 3 párrafos cortos)
-[Escribí un asunto magnético y un cuerpo de mail que enganche en los primeros 5 segundos. Debe abrir saludando, conectar un logro o enfoque actual en Corrugadora Centro S.A. con la necesidad de la oferta, mencionar la combinación de automatización + ERP como tu diferencial, y cerrar invitando a ver el CV adjunto con un llamado a la acción limpio].
+### Opción 1: Versión para Email (Forzar estructura rígida de 3 párrafos)
+[Escribí un asunto magnético. El cuerpo debe tener exactamente 3 párrafos:
+P1: Resumen breve de tu perfil.
+P2: Interés en la vacante X + "Soy especialista en...".
+P3: Motivación por la empresa, retos y disponibilidad.
+Cierre estricto (copiar literal): "de antemano agradezco su atención, espero que tengan un buen día. Atte. ${candidateName}"].
 
-### Opción 2: Versión para LinkedIn (Mensaje corto de red / InMail - Máx. 100 palabras)
-[Un mensaje ultra-compacto, ideal para leer desde el celular en una pantalla. Va directo al motivo del contacto, destaca el match técnico principal y propone una breve charla].`;
+### Opción 2: Versión para LinkedIn (Formato ultra-corto de red)
+[Generá un mensaje con exactamente esta estructura rellenando los corchetes: "Hola [Nombre de recruiter]! vi la búsqueda de [Postulación laboral] y creo que mi experiencia encaja con el puesto... [Texto breve de match]... Te dejo mi CV si te interesa profundizar. Saludos!"].`;
 }
 
 // ── Filename helpers ─────────────────────────────────────────────────────────
