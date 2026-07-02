@@ -76,7 +76,12 @@ Lista de modificaciones críticas para limpiar la interfaz y ajustar el comporta
 		- [x] https://campus.epam.com/en
 		- [x] https://www.empleosit.com.ar/
 		
-- [ ] Modificación 5: Modificar interfaz por algo más moderno.
+- [x] **Modificación 5: Migración a Sidebar Global**
+	- [x] Eliminar navegación superior (tabs).
+	- [x] Implementar barra lateral persistente (Sidebar) con layout Flexbox (ancho ~260px).
+	- [x] Trasladar botones de Importar/Exportar JSON al footer del sidebar.
+	- [x] Agregar selector global de CV ("CV Seleccionado") arriba del backup de datos.
+	- [x] Aplicar colores de marca: Naranja #F19C49 (sidebar) y Alabaster #F2F0E6 (contenido principal).
 ---
 
 ### ⏳ Siguientes Fases del Desarrollo Base

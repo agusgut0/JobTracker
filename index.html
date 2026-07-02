@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Job Tracker</title>
+  <title>JobTracker — Tu asistente de búsqueda laboral</title>
+  <meta name="description" content="JobTracker: organizá tu búsqueda laboral, gestioná aplicaciones, y generá prompts IA para tu CV y cartas de presentación." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -15,25 +16,101 @@
 
 <body>
 
-  <div class="app-container">
+  <div class="app-layout">
 
-    <!-- HEADER -->
-    <header class="app-header">
-      <h1 class="app-title">Job Tracker</h1>
-      <p class="app-subtitle" id="appSubtitle">Tu asistente de búsqueda laboral</p>
-    </header>
+    <!-- ====== SIDEBAR ====== -->
+    <aside class="sidebar" id="sidebar">
 
-    <!-- NAV TABS -->
-    <nav class="tab-nav" role="tablist">
-      <button class="tab-btn active" role="tab" data-tab="busquedas" aria-selected="true">🔍 Búsquedas</button>
-      <button class="tab-btn" role="tab" data-tab="aplicaciones" aria-selected="false">📋 Aplicaciones</button>
-      <button class="tab-btn" role="tab" data-tab="micv" aria-selected="false">👤 Mi CV</button>
-    </nav>
+      <!-- Sidebar Header / Brand -->
+      <div class="sidebar-brand">
+        <span class="sidebar-logo">💼</span>
+        <div>
+          <h1 class="sidebar-title">JobTracker</h1>
+          <p class="sidebar-subtitle" id="appSubtitle">Tu asistente de búsqueda laboral</p>
+        </div>
+      </div>
 
-    <main class="tab-panels">
+      <!-- Sidebar Navigation -->
+      <nav class="sidebar-nav" role="tablist">
+        <button class="sidebar-nav-btn active" role="tab" data-tab="inicio" aria-selected="true">
+          <span class="sidebar-nav-ico">🏠</span>
+          <span class="sidebar-nav-label">Sobre la aplicación</span>
+        </button>
+        <button class="sidebar-nav-btn" role="tab" data-tab="busquedas" aria-selected="false">
+          <span class="sidebar-nav-ico">🔍</span>
+          <span class="sidebar-nav-label">Búsquedas</span>
+        </button>
+        <button class="sidebar-nav-btn" role="tab" data-tab="aplicaciones" aria-selected="false">
+          <span class="sidebar-nav-ico">📋</span>
+          <span class="sidebar-nav-label">Aplicaciones</span>
+        </button>
+        <button class="sidebar-nav-btn" role="tab" data-tab="micv" aria-selected="false">
+          <span class="sidebar-nav-ico">👤</span>
+          <span class="sidebar-nav-label">Mi CV</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar CV Selector -->
+      <div class="sidebar-cv-selector">
+        <label for="cvGlobalSelect" class="sidebar-cv-label">👤 CV Seleccionado:</label>
+        <select id="cvGlobalSelect" class="sidebar-cv-select">
+          <!-- Populated dynamically -->
+        </select>
+      </div>
+
+      <!-- Sidebar Footer: Import / Export -->
+      <div class="sidebar-footer">
+        <p class="sidebar-footer-title">💾 Backup de datos</p>
+        <button id="btnExport" class="sidebar-btn sidebar-btn-export">📥 Exportar JSON</button>
+        <button id="btnImportTrigger" class="sidebar-btn sidebar-btn-import">📤 Importar JSON</button>
+        <input type="file" id="importFile" accept=".json" hidden />
+      </div>
+
+    </aside>
+
+    <!-- ====== MAIN CONTENT ====== -->
+    <main class="main-content">
+
+      <!-- TAB: SOBRE LA APLICACIÓN (INICIO) -->
+      <section id="tab-inicio" class="tab-panel active" role="tabpanel">
+
+        <div class="inicio-hero">
+          <h2 class="inicio-title">JobTracker</h2>
+          <p class="inicio-subtitle">Tu asistente de búsqueda laboral</p>
+        </div>
+
+        <div class="inicio-body">
+          <div class="card">
+            <h3 class="card-title">📖 ¿Qué es JobTracker?</h3>
+            <p class="inicio-text">
+              JobTracker es tu panel de control personal y privado para organizar, gestionar y potenciar tu búsqueda de empleo en el sector IT. Funciona completamente de manera local en tu navegador y utiliza herramientas de Inteligencia Artificial para ayudarte a optimizar tus postulaciones.
+            </p>
+          </div>
+          <div class="card">
+            <h3 class="card-title">🚀 ¿Cómo funciona? (Paso a Paso)</h3>
+            <div class="inicio-text">
+              <ol style="margin-left: 20px; margin-top: 8px; line-height: 1.6;">
+                <li><strong>1. Carga tus perfiles en "Mi CV":</strong> Lo primero es ir a la pestaña "Mi CV". Ahí podés cargar hasta 20 perfiles distintos usando el carrusel superior. Llená tus datos y dale a <em>Guardar CV</em>. Podés tener un CV para "Backend", otro para "Frontend", etc.</li>
+                <li><strong>2. Buscá ofertas en "Búsquedas":</strong> Escribí el rol que te interesa (ej. "React Developer") y usá los botones de las distintas plataformas para abrir búsquedas automáticas pre-filtradas en LinkedIn, Indeed, Get on Board y más.</li>
+                <li><strong>3. Registrá tus postulaciones en "Aplicaciones":</strong> Cuando te postules a una vacante o te interese alguna, registrala acá. Poné el puesto, la empresa, el link y la descripción de la vacante. Vas a poder cambiar su estado (Pendiente, Aplicada, Entrevista, Descartada).</li>
+                <li><strong>4. Usá la IA a tu favor:</strong> En cada postulación guardada vas a ver 3 botones mágicos. Estos botones leen la vacante y tu CV seleccionado actual, y te generan un <em>prompt</em> listo para pegar en ChatGPT/Claude y conseguir: tu nivel de coincidencia (Fit), tu CV adaptado a las palabras clave de la oferta, o una carta de presentación perfecta.</li>
+              </ol>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="card-title">✦ Funcionalidades principales</h3>
+            <ul class="inicio-text" style="margin-left: 20px; margin-top: 8px; line-height: 1.6; list-style-type: disc;">
+              <li><strong>Privacidad Total (Local Storage):</strong> Tus datos nunca se envían a un servidor. Se guardan en el almacenamiento de tu navegador.</li>
+              <li><strong>Descarga de CV (DOCX):</strong> Exportá tu perfil en un formato profesional listo para pasar los filtros automáticos (ATS).</li>
+              <li><strong>Backup de Datos:</strong> Usá los botones del menú izquierdo para descargar toda tu base de datos en JSON y subirla en otra PC o navegador.</li>
+            </ul>
+          </div>
+        </div>
+
+      </section>
 
       <!-- TAB: BÚSQUEDAS -->
-      <section id="tab-busquedas" class="tab-panel active" role="tabpanel">
+      <section id="tab-busquedas" class="tab-panel" role="tabpanel">
 
         <div class="card">
           <h2 class="card-title">➕ Agregar rol de interés</h2>
@@ -112,9 +189,16 @@
       <!-- TAB: MI CV -->
       <section id="tab-micv" class="tab-panel" role="tabpanel">
 
+        <!-- CV CAROUSEL NAV -->
+        <div class="cv-carousel" id="cvCarousel">
+          <button class="cv-carousel-btn" id="cvPrev" title="CV anterior">‹</button>
+          <span class="cv-carousel-title" id="cvSlotTitle">CV 1</span>
+          <button class="cv-carousel-btn" id="cvNext" title="CV siguiente">›</button>
+        </div>
+
         <div class="card">
           <h2 class="card-title">📄 Mi perfil profesional</h2>
-          <p class="hint-text">✏️ Editable en tiempo real. Cada cambio se guarda automáticamente.</p>
+          <p class="hint-text">✏️ Completá los campos y presioná "Guardar CV" para almacenar este perfil.</p>
           <div class="form-grid" id="cvForm">
             <div class="form-group">
               <label for="cvNombre">Nombre y Apellido *</label>
@@ -178,13 +262,10 @@
           <button id="btnDownloadCV" class="btn-export">📄 Descargar Mi CV (.docx)</button>
         </div>
 
-        <div class="card">
-          <h2 class="card-title">💾 Backup de datos</h2>
-          <p class="hint-text">Los datos persisten en tu navegador (localStorage). Usá el backup JSON como respaldo
-            externo.</p>
-          <button id="btnExport" class="btn-export">📥 Exportar JSON</button>
-          <button id="btnImportTrigger" class="btn-import">📤 Importar JSON</button>
-          <input type="file" id="importFile" accept=".json" hidden />
+        <!-- CV ACTION BUTTONS -->
+        <div class="cv-action-buttons">
+          <button id="btnSaveCV" class="btn-save-cv">💾 Guardar CV</button>
+          <button id="btnDeleteCV" class="btn-delete-cv">🗑️ Eliminar</button>
         </div>
 
       </section>
