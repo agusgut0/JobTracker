@@ -37,10 +37,7 @@ export function updateSubtitle(data) {
     el.appSubtitle.textContent = 'Tu asistente de búsqueda laboral';
     return;
   }
-  const parts = [];
-  if (data.nombre) parts.push(data.nombre);
-  if (data.rol) parts.push(data.rol);
-  el.appSubtitle.textContent = parts.join(' | ');
+  el.appSubtitle.textContent = data.nombre;
 }
 
 /**
@@ -51,8 +48,22 @@ export function updateSubtitle(data) {
  */
 export function renderCVGlobalSelector(slots, activeIndex) {
   if (!el.cvGlobalSelect) return;
-  el.cvGlobalSelect.innerHTML = slots.map((slot, i) => {
-    const title = slot && slot.rol ? `CV ${i + 1} - ${slot.rol}` : `CV ${i + 1} (Vacío)`;
+  
+  // Filtrar solo los slots que tienen información real
+  const validSlots = slots
+    .map((slot, i) => ({ slot, i }))
+    .filter(item => item.slot && (item.slot.nombre || item.slot.rol || item.slot.experiencia || item.slot.resumen));
+
+  if (validSlots.length === 0) {
+    el.cvGlobalSelect.innerHTML = `<option value="" disabled selected>No hay CVs con datos</option>`;
+    return;
+  }
+
+  // Si el activeIndex actual es uno vacío, el navegador seleccionará visualmente el primero válido.
+  // Para evitar desincronizaciones engañosas, forzamos a que si el índice activo actual no está 
+  // en la lista de válidos, no le pongamos 'selected' a ninguno (o se selecciona el primero visualmente).
+  el.cvGlobalSelect.innerHTML = validSlots.map(({ slot, i }) => {
+    const title = slot.rol ? `CV ${i + 1} - ${slot.rol}` : `CV ${i + 1} - ${slot.nombre || 'Sin título'}`;
     return `<option value="${i}" ${i === activeIndex ? 'selected' : ''}>${esc(title)}</option>`;
   }).join('');
 }

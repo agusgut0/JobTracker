@@ -210,6 +210,9 @@ body {
   outline: none;
   cursor: pointer;
   transition: all var(--transition);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .sidebar-cv-select:focus {
@@ -290,7 +293,10 @@ body {
 
 /* ── TAB PANELS ──────────────────────────────────────────────── */
 .tab-panel { display: none; }
-.tab-panel.active { display: block; }
+.tab-panel.active { 
+  display: block; 
+  animation: fadeInUp .4s ease both;
+}
 
 /* ── INICIO / ABOUT ──────────────────────────────────────────── */
 .inicio-hero {
@@ -304,7 +310,6 @@ body {
   color: var(--accent);
   letter-spacing: -1px;
   line-height: 1.15;
-  animation: fadeInUp .5s ease both;
 }
 
 .inicio-subtitle {
@@ -313,13 +318,11 @@ body {
   margin-top: 8px;
   font-weight: 300;
   letter-spacing: .3px;
-  animation: fadeInUp .5s ease .1s both;
 }
 
 .inicio-body {
   max-width: 720px;
   margin: 0 auto;
-  animation: fadeInUp .5s ease .2s both;
 }
 
 .inicio-text {
@@ -332,6 +335,130 @@ body {
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-cta {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 12px 24px;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  animation: fadeInUp .5s ease .3s both;
+}
+
+.hero-cta:hover {
+  background-color: var(--accent-light);
+  color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  transition: transform var(--transition);
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+}
+
+.feature-icon {
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+}
+
+.feature-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.feature-text {
+  font-size: 0.8rem;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.faq-section {
+  margin-top: 30px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.faq-heading {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.faq-summary {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text);
+  cursor: pointer;
+  padding: 12px 0;
+  list-style: none; /* Hide default arrow */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.faq-summary::-webkit-details-marker {
+  display: none; /* Hide default arrow in webkit */
+}
+
+.faq-summary::after {
+  content: '+';
+  color: var(--accent);
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: transform 0.2s;
+}
+
+.faq-item[open] .faq-summary::after {
+  content: '−';
+}
+
+.faq-details {
+  padding-bottom: 16px;
+  font-size: 0.8rem;
+  color: var(--text-2);
+  line-height: 1.6;
 }
 
 /* ── CARD ────────────────────────────────────────────────────── */
@@ -575,13 +702,39 @@ textarea { resize: vertical; min-height: 72px; }
 
 .btn-primary:hover { opacity: .87; }
 
+/* ── FILTERS BAR ─────────────────────────────────────────────── */
+.filters-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-input, .filter-select {
+  flex: 1;
+  min-width: 150px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: .82rem;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.filter-input:focus, .filter-select:focus {
+  border-color: var(--accent);
+}
+
 /* ── OFFER CARDS ─────────────────────────────────────────────── */
 .offer-card {
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
   padding: 14px;
-  margin-bottom: 10px;
+  margin-bottom: 15px; /* Separación bien marcada */
   box-shadow: var(--shadow);
 }
 

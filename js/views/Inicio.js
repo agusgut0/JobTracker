@@ -1,10 +1,15 @@
 /**
  * @file Inicio.js
- * @description Vista estática de la sección "Sobre la aplicación".
- * Encargada de renderizar o atar eventos iniciales de la pantalla de bienvenida.
+ * @description Vista de la sección "Sobre la aplicación".
  */
 
+import * as Sidebar from '../components/Sidebar.js';
+
 export function init() {
-  // Actualmente la vista de Inicio es completamente estática y no requiere
-  // listeners complejos. Este archivo queda preparado para futura lógica.
+  const btnStartNow = document.getElementById('btnStartNow');
+  if (btnStartNow) {
+    btnStartNow.addEventListener('click', () => {
+      Sidebar.switchTab('micv');
+    });
+  }
 }

@@ -5,7 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JobTracker — Tu asistente de búsqueda laboral</title>
-  <meta name="description" content="JobTracker: organizá tu búsqueda laboral, gestioná aplicaciones, y generá prompts IA para tu CV y cartas de presentación." />
+  <meta name="description"
+    content="JobTracker: organizá tu búsqueda laboral, gestioná aplicaciones, y generá prompts IA para tu CV y cartas de presentación." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -77,33 +78,68 @@
         <div class="inicio-hero">
           <h2 class="inicio-title">JobTracker</h2>
           <p class="inicio-subtitle">Tu asistente de búsqueda laboral</p>
+          <button id="btnStartNow" class="hero-cta">Empezar ahora 🚀</button>
         </div>
 
         <div class="inicio-body">
-          <div class="card">
-            <h3 class="card-title">📖 ¿Qué es JobTracker?</h3>
-            <p class="inicio-text">
-              JobTracker es tu panel de control personal y privado para organizar, gestionar y potenciar tu búsqueda de empleo en el sector IT. Funciona completamente de manera local en tu navegador y utiliza herramientas de Inteligencia Artificial para ayudarte a optimizar tus postulaciones.
-            </p>
-          </div>
-          <div class="card">
-            <h3 class="card-title">🚀 ¿Cómo funciona? (Paso a Paso)</h3>
-            <div class="inicio-text">
-              <ol style="margin-left: 20px; margin-top: 8px; line-height: 1.6;">
-                <li><strong>1. Carga tus perfiles en "Mi CV":</strong> Lo primero es ir a la pestaña "Mi CV". Ahí podés cargar hasta 20 perfiles distintos usando el carrusel superior. Llená tus datos y dale a <em>Guardar CV</em>. Podés tener un CV para "Backend", otro para "Frontend", etc.</li>
-                <li><strong>2. Buscá ofertas en "Búsquedas":</strong> Escribí el rol que te interesa (ej. "React Developer") y usá los botones de las distintas plataformas para abrir búsquedas automáticas pre-filtradas en LinkedIn, Indeed, Get on Board y más.</li>
-                <li><strong>3. Registrá tus postulaciones en "Aplicaciones":</strong> Cuando te postules a una vacante o te interese alguna, registrala acá. Poné el puesto, la empresa, el link y la descripción de la vacante. Vas a poder cambiar su estado (Pendiente, Aplicada, Entrevista, Descartada).</li>
-                <li><strong>4. Usá la IA a tu favor:</strong> En cada postulación guardada vas a ver 3 botones mágicos. Estos botones leen la vacante y tu CV seleccionado actual, y te generan un <em>prompt</em> listo para pegar en ChatGPT/Claude y conseguir: tu nivel de coincidencia (Fit), tu CV adaptado a las palabras clave de la oferta, o una carta de presentación perfecta.</li>
-              </ol>
+
+          <!-- Features Grid -->
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon">🔒</div>
+              <h4 class="feature-title">100% Privado</h4>
+              <p class="feature-text">Toda tu información se almacena localmente en tu navegador. Sin servidores, sin
+                rastreo.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">⚡</div>
+              <h4 class="feature-title">Eficiencia ATS</h4>
+              <p class="feature-text">Exportá tu CV directamente a formato DOCX optimizado para superar los filtros
+                automáticos.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🤖</div>
+              <h4 class="feature-title">Prompts IA</h4>
+              <p class="feature-text">Generá comandos mágicos instantáneos para evaluar tu Fit o redactar cartas
+                cualquier IA.</p>
             </div>
           </div>
-          <div class="card">
-            <h3 class="card-title">✦ Funcionalidades principales</h3>
-            <ul class="inicio-text" style="margin-left: 20px; margin-top: 8px; line-height: 1.6; list-style-type: disc;">
-              <li><strong>Privacidad Total (Local Storage):</strong> Tus datos nunca se envían a un servidor. Se guardan en el almacenamiento de tu navegador.</li>
-              <li><strong>Descarga de CV (DOCX):</strong> Exportá tu perfil en un formato profesional listo para pasar los filtros automáticos (ATS).</li>
-              <li><strong>Backup de Datos:</strong> Usá los botones del menú izquierdo para descargar toda tu base de datos en JSON y subirla en otra PC o navegador.</li>
-            </ul>
+
+          <!-- FAQ Accordion -->
+          <div class="faq-section">
+            <h3 class="faq-heading">Preguntas Frecuentes</h3>
+
+            <details class="faq-item">
+              <summary class="faq-summary">¿Pierdo mis datos si borro el historial del navegador?</summary>
+              <div class="faq-details">
+                <p>Sí, ya que JobTracker funciona 100% de manera local, los datos se guardan en el <em>Almacenamiento
+                    Local</em> de tu navegador. Si lo borrás por completo, perderás la información. Te recomiendo
+                  utilizar la opción <strong>"Exportar JSON"</strong> regularmente para crear copias de seguridad.</p>
+              </div>
+            </details>
+
+            <details class="faq-item">
+              <summary class="faq-summary">¿Cómo utilizo los botones de Inteligencia Artificial?</summary>
+              <div class="faq-details">
+                <p>Al guardar una postulación en la pestaña <strong>Aplicaciones</strong>, aparecerán tres botones. Al
+                  hacer clic en cualquiera de ellos, se copiará automáticamente un prompt específico a tu portapapeles.
+                  Solo tenés que pegarlo en el chat de IA que más te guste, pegarlo y ver la magia.</p>
+              </div>
+            </details>
+
+            <details class="faq-item">
+              <summary class="faq-summary">¿Para qué me sirve tener más de un CV guardado?</summary>
+              <div class="faq-details">
+                <p>Si buscás roles ligeramente distintos (por ejemplo, "Analista QA" y "Desarrollador Frontend"), podés
+                  mantener un CV optimizado para cada perfil. Cuando vayas a generar un Prompt IA para una vacante
+                  específica, asegurate de seleccionar en la barra lateral el CV que mejor se adapte.</p>
+              </div>
+            </details>
+          </div>
+
+          <div style="text-align: center; margin-top: 40px; font-size: 0.85rem; color: var(--text-2);">
+            Hecho con 💓 por <a href="https://github.com/agusgut0" target="_blank"
+              style="color: var(--accent); text-decoration: none; font-weight: 600;">Agustín</a>
           </div>
         </div>
 
@@ -114,7 +150,8 @@
 
         <div class="card">
           <h2 class="card-title">➕ Agregar rol de interés</h2>
-          <p class="hint-text">Escribí un rol técnico que te interese buscar (ej: Desarrollador Frontend, Analista QA).</p>
+          <p class="hint-text">Escribí un rol técnico que te interese buscar (ej: Desarrollador Frontend, Analista QA).
+          </p>
           <div class="role-input-row" id="roleInputRow">
             <input id="roleInput" type="text" placeholder="Ej: Analista Funcional" />
             <button id="btnAddRole" class="btn-primary btn-sm">+ Agregar</button>
@@ -179,6 +216,19 @@
             </div>
             <button type="submit" class="btn-primary">Guardar oferta</button>
           </form>
+        </div>
+
+        <!-- FILTERS BAR -->
+        <div class="filters-bar">
+          <input type="text" id="filterPuesto" class="filter-input" placeholder="🔍 Filtrar por puesto..." />
+          <input type="text" id="filterEmpresa" class="filter-input" placeholder="🏢 Filtrar por empresa..." />
+          <select id="filterEstado" class="filter-select">
+            <option value="todos">Todos los estados</option>
+            <option value="pendiente">🟠 Pendiente</option>
+            <option value="aplicada">🟢 Aplicada</option>
+            <option value="entrevista">🔵 Entrevista</option>
+            <option value="descartada">🔴 Descartada</option>
+          </select>
         </div>
 
         <!-- OFFER LIST -->

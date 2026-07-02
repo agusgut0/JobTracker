@@ -10,6 +10,11 @@ import { showToast } from '../components/Toast.js';
 
 // ── Variables Globales de Estado UI ──────────────────────────────────────────
 let pendingDelete = null; // ID de la oferta pendiente de eliminación
+const filters = {
+  puesto: '',
+  empresa: '',
+  estado: 'todos'
+};
 
 // ── Caché del DOM ────────────────────────────────────────────────────────────
 const el = {
@@ -24,6 +29,10 @@ const el = {
   fDesc:          document.getElementById('fDesc'),
   fEstado:        document.getElementById('fEstado'),
   offerList:      document.getElementById('offerList'),
+  // Filters
+  filterPuesto:   document.getElementById('filterPuesto'),
+  filterEmpresa:  document.getElementById('filterEmpresa'),
+  filterEstado:   document.getElementById('filterEstado'),
   // Modals
   modalDelete:    document.getElementById('modalDelete'),
   modalCancel:    document.getElementById('modalCancelBtn'),
@@ -56,32 +65,40 @@ function renderStats() {
 /** Dibuja la lista de tarjetas de postulación */
 function renderOffers() {
   if (!el.offerList) return;
-  const jobs = getJobs();
+  
+  // Filter jobs based on state
+  const jobs = getJobs().filter(job => {
+    const matchPuesto = job.puesto.toLowerCase().includes(filters.puesto.toLowerCase());
+    const matchEmpresa = job.empresa.toLowerCase().includes(filters.empresa.toLowerCase());
+    const matchEstado = filters.estado === 'todos' || job.estado === filters.estado;
+    return matchPuesto && matchEmpresa && matchEstado;
+  });
+
   if (!jobs.length) {
     el.offerList.innerHTML = `
       <div class="empty-state">
-        <h3>No hay postulaciones aún</h3>
-        <p>Guardá tu primera oferta usando el formulario de la izquierda.</p>
+        <h3>No hay postulaciones para mostrar</h3>
+        <p>No se encontraron resultados para los filtros actuales, o no tenés postulaciones guardadas.</p>
       </div>`;
     return;
   }
 
   el.offerList.innerHTML = jobs.map(job => `
-    <article class="job-card">
+    <article class="offer-card">
       <!-- HEADER -->
-      <div class="jc-header">
-        <h3 class="jc-title" title="${esc(job.puesto)}">${esc(job.puesto)}</h3>
-        <span class="jc-status" data-status="${job.estado}">${ESTADO_LABELS[job.estado]}</span>
+      <div class="offer-header">
+        <h3 class="offer-title" title="${esc(job.puesto)}">${esc(job.puesto)}</h3>
+        <span class="badge badge-${job.estado}" data-status="${job.estado}">${ESTADO_LABELS[job.estado]}</span>
       </div>
       <!-- META -->
-      <div class="jc-meta">
+      <div class="offer-meta">
         <span class="company" title="${esc(job.empresa)}">🏢 ${esc(job.empresa)}</span>
         <span class="date">📅 ${job.fecha}</span>
       </div>
       <!-- DESC -->
-      ${job.desc ? `<div id="desc-${job.id}" class="jc-desc">${esc(job.desc)}</div>` : ''}
+      ${job.desc ? `<div id="desc-${job.id}" class="offer-desc">${esc(job.desc)}</div>` : ''}
       <!-- ACTIONS -->
-      <div class="jc-actions">
+      <div class="offer-actions">
         ${job.link
           ? `<a href="${esc(job.link)}" target="_blank" rel="noopener noreferrer" class="btn-sm">🔗 Ver oferta</a>`
           : ''}
@@ -195,6 +212,26 @@ async function handleAIAction(jobId, type) {
 // ── Inicialización ───────────────────────────────────────────────────────────
 
 export function init() {
+  // Bind filters
+  if (el.filterPuesto) {
+    el.filterPuesto.addEventListener('input', e => {
+      filters.puesto = e.target.value;
+      renderOffers();
+    });
+  }
+  if (el.filterEmpresa) {
+    el.filterEmpresa.addEventListener('input', e => {
+      filters.empresa = e.target.value;
+      renderOffers();
+    });
+  }
+  if (el.filterEstado) {
+    el.filterEstado.addEventListener('change', e => {
+      filters.estado = e.target.value;
+      renderOffers();
+    });
+  }
+
   if (el.offerForm) {
     el.offerForm.addEventListener('submit', handleAddOffer);
   }
