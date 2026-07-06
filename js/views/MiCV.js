@@ -59,6 +59,15 @@ function cacheDOM() {
   el.globalPicInput      = document.getElementById('globalPicInput');
   el.btnDeletePic        = document.getElementById('btnDeletePic');
 
+  // Modals para descarga
+  el.modalDownloadCVSettings = document.getElementById('modalDownloadCVSettings');
+  el.modalDownloadCVCancelBtn = document.getElementById('modalDownloadCVCancelBtn');
+  el.modalDownloadCVConfirmBtn = document.getElementById('modalDownloadCVConfirmBtn');
+  el.cvScaleTitle            = document.getElementById('cvScaleTitle');
+  el.cvScaleBody             = document.getElementById('cvScaleBody');
+  el.lblScaleTitle           = document.getElementById('lblScaleTitle');
+  el.lblScaleBody            = document.getElementById('lblScaleBody');
+
   CV_FIELDS.forEach(f => {
     fields[f.id] = document.getElementById(f.id);
   });
@@ -878,13 +887,16 @@ function handleAddProyecto() {
   newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-/** Genera y descarga el CV en PDF (ATS-optimized) usando el diálogo de impresión. */
-async function handleDownloadCV() {
+async function executeDownloadCV() {
   const cv = getCVData();
   if (!cv.nombre) {
     showToast('⚠️ Completá al menos tu Nombre y Apellido para descargar el CV.');
     return;
   }
+  
+  // Agregar configuración de escala de fuentes
+  cv.scaleTitle = el.cvScaleTitle ? el.cvScaleTitle.value : 1.0;
+  cv.scaleBody = el.cvScaleBody ? el.cvScaleBody.value : 1.0;
 
   try {
     const pic = await getProfilePic();
@@ -921,6 +933,30 @@ async function handleDownloadCV() {
   } catch (error) {
     console.error(error);
     showToast('⚠️ Error al generar CV. Revisá la consola.');
+  } finally {
+    if (el.modalDownloadCVSettings) {
+      el.modalDownloadCVSettings.setAttribute('hidden', '');
+    }
+  }
+}
+
+function handleDownloadCVClick() {
+  const cv = getCVData();
+  if (!cv.nombre) {
+    showToast('⚠️ Completá al menos tu Nombre y Apellido para descargar el CV.');
+    return;
+  }
+  
+  if (el.modalDownloadCVSettings) {
+    // Restaurar valores por defecto
+    if (el.cvScaleTitle) el.cvScaleTitle.value = "1.0";
+    if (el.cvScaleBody) el.cvScaleBody.value = "1.0";
+    if (el.lblScaleTitle) el.lblScaleTitle.textContent = 'Tamaño de Títulos (100%)';
+    if (el.lblScaleBody) el.lblScaleBody.textContent = 'Tamaño de Textos (100%)';
+    
+    el.modalDownloadCVSettings.removeAttribute('hidden');
+  } else {
+    executeDownloadCV();
   }
 }
 
@@ -975,7 +1011,7 @@ export function init() {
   
   if (el.btnSaveCV) el.btnSaveCV.addEventListener('click', handleSaveCV);
   if (el.btnDeleteCV) el.btnDeleteCV.addEventListener('click', handleDeleteCV);
-  if (el.btnDownloadCV) el.btnDownloadCV.addEventListener('click', handleDownloadCV);
+  if (el.btnDownloadCV) el.btnDownloadCV.addEventListener('click', handleDownloadCVClick);
   if (el.btnCopyCV) el.btnCopyCV.addEventListener('click', handleCopyCV);
   if (el.btnPasteCV) el.btnPasteCV.addEventListener('click', handlePasteCV);
   if (el.btnAddExp) el.btnAddExp.addEventListener('click', handleAddExperience);
@@ -1009,6 +1045,24 @@ export function init() {
       const newCard = createFormacionCard(defaultFormacion(), cards.length);
       el.formacionContainer.appendChild(newCard);
       newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  }
+
+  // Download Settings Modal
+  if (el.modalDownloadCVSettings) {
+    el.modalDownloadCVCancelBtn.addEventListener('click', () => {
+      el.modalDownloadCVSettings.setAttribute('hidden', '');
+    });
+    el.modalDownloadCVConfirmBtn.addEventListener('click', executeDownloadCV);
+    
+    el.cvScaleTitle.addEventListener('input', (e) => {
+      const percentage = Math.round(e.target.value * 100);
+      el.lblScaleTitle.textContent = `Tamaño de Títulos (${percentage}%)`;
+    });
+    
+    el.cvScaleBody.addEventListener('input', (e) => {
+      const percentage = Math.round(e.target.value * 100);
+      el.lblScaleBody.textContent = `Tamaño de Textos (${percentage}%)`;
     });
   }
   

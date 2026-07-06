@@ -110,6 +110,29 @@
       </div>
     </div>
   </div>
+  
+  <!-- MODAL: CONFIG DESCARGA CV -->
+  <div id="modalDownloadCVSettings" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalDownloadCVTitle" hidden>
+    <div class="modal">
+      <h3 id="modalDownloadCVTitle" class="modal-title">Configuración de PDF</h3>
+      <p class="modal-body" style="margin-bottom: 15px;">Ajustá el tamaño de los textos para que tu CV encaje mejor en las páginas.</p>
+      
+      <div class="form-group">
+        <label for="cvScaleTitle" id="lblScaleTitle">Tamaño de Títulos (100%)</label>
+        <input type="range" id="cvScaleTitle" min="0.7" max="1.3" step="0.1" value="1.0" style="width: 100%;" />
+      </div>
+      
+      <div class="form-group" style="margin-top: 15px;">
+        <label for="cvScaleBody" id="lblScaleBody">Tamaño de Textos (100%)</label>
+        <input type="range" id="cvScaleBody" min="0.7" max="1.3" step="0.1" value="1.0" style="width: 100%;" />
+      </div>
+
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button id="modalDownloadCVCancelBtn" class="btn-modal-cancel">Cancelar</button>
+        <button id="modalDownloadCVConfirmBtn" class="btn-modal-confirm">Continuar</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="js/app.js"></script>
 </body>

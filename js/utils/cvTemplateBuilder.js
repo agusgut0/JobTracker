@@ -218,6 +218,8 @@ export function buildATSCurriculumHTML(cvData) {
             --color-texto: #333333;
             --color-secundario: #555555;
             --color-gris-claro: #e0e0e0;
+            --scale-title: ${cvData.scaleTitle || 1.0};
+            --scale-body: ${cvData.scaleBody || 1.0};
         }
 
         @page {
@@ -226,7 +228,7 @@ export function buildATSCurriculumHTML(cvData) {
 
         body {
             font-family: Arial, Helvetica, sans-serif;
-            font-size: 9pt;
+            font-size: calc(9pt * var(--scale-body));
             line-height: 1.5;
             color: var(--color-texto);
             margin: 0;
@@ -261,7 +263,7 @@ export function buildATSCurriculumHTML(cvData) {
         }
 
         h1 {
-            font-size: 32px;
+            font-size: calc(32px * var(--scale-title));
             font-weight: bold;
             color: var(--color-principal);
             margin: 0;
@@ -269,14 +271,14 @@ export function buildATSCurriculumHTML(cvData) {
         }
 
         .role-title {
-            font-size: 18px;
+            font-size: calc(18px * var(--scale-title));
             font-weight: bold;
             color: var(--color-principal);
             margin: 5px 0;
         }
 
         .contact-info {
-            font-size: 14px;
+            font-size: calc(14px * var(--scale-body));
             color: var(--color-texto);
         }
 
@@ -288,7 +290,7 @@ export function buildATSCurriculumHTML(cvData) {
 
         h2 {
             text-transform: uppercase;
-            font-size: 18px;
+            font-size: calc(18px * var(--scale-title));
             color: var(--color-principal);
             margin: 0 0 5px 0;
             padding-bottom: 5px;
@@ -310,14 +312,14 @@ export function buildATSCurriculumHTML(cvData) {
         }
 
         .exp-header {
-            font-size: 12pt;
+            font-size: calc(12pt * var(--scale-body));
         }
 
         .exp-dates {
             font-style: italic;
             color: var(--color-secundario);
             margin-bottom: 5px;
-            font-size: 10pt;
+            font-size: calc(10pt * var(--scale-body));
         }
         
         .exp-desc {
