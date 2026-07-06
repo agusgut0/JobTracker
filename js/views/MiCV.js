@@ -21,43 +21,45 @@ const CV_FIELDS = [
 
 // ── Caché del DOM ────────────────────────────────────────────────────────────
 
-const el = {
-  cvPrev:              document.getElementById('cvPrev'),
-  cvNext:              document.getElementById('cvNext'),
-  cvSlotTitle:         document.getElementById('cvSlotTitle'),
-  btnSaveCV:           document.getElementById('btnSaveCV'),
-  btnDeleteCV:         document.getElementById('btnDeleteCV'),
-  btnDownloadCV:       document.getElementById('btnDownloadCV'),
-  btnCopyCV:           document.getElementById('btnCopyCV'),
-  btnPasteCV:          document.getElementById('btnPasteCV'),
-  expContainer:        document.getElementById('cvExperienciaContainer'),
-  btnAddExp:           document.getElementById('btnAddExp'),
-  
-  pillsHabTec:         document.getElementById('pillsHabTec'),
-  inputHabTec:         document.getElementById('inputHabTec'),
-  btnAddHabTec:        document.getElementById('btnAddHabTec'),
-  
-  pillsHabBlandas:     document.getElementById('pillsHabBlandas'),
-  inputHabBlandas:     document.getElementById('inputHabBlandas'),
-  btnAddHabBlandas:    document.getElementById('btnAddHabBlandas'),
-  
-  pillsIdiomas:        document.getElementById('pillsIdiomas'),
-  inputIdiomaNombre:   document.getElementById('inputIdiomaNombre'),
-  inputIdiomaNivel:    document.getElementById('inputIdiomaNivel'),
-  btnAddIdioma:        document.getElementById('btnAddIdioma'),
-  
-  formacionContainer:  document.getElementById('cvFormacionContainer'),
-  btnAddFormacion:     document.getElementById('btnAddFormacion'),
-  
-  globalPicPreview:    document.getElementById('globalPicPreview'),
-  globalPicInput:      document.getElementById('globalPicInput'),
-  btnDeletePic:        document.getElementById('btnDeletePic'),
-};
-
+const el = {};
 const fields = {};
-CV_FIELDS.forEach(f => {
-  fields[f.id] = document.getElementById(f.id);
-});
+
+function cacheDOM() {
+  el.cvPrev              = document.getElementById('cvPrev');
+  el.cvNext              = document.getElementById('cvNext');
+  el.cvSlotTitle         = document.getElementById('cvSlotTitle');
+  el.btnSaveCV           = document.getElementById('btnSaveCV');
+  el.btnDeleteCV         = document.getElementById('btnDeleteCV');
+  el.btnDownloadCV       = document.getElementById('btnDownloadCV');
+  el.btnCopyCV           = document.getElementById('btnCopyCV');
+  el.btnPasteCV          = document.getElementById('btnPasteCV');
+  el.expContainer        = document.getElementById('cvExperienciaContainer');
+  el.btnAddExp           = document.getElementById('btnAddExp');
+  
+  el.pillsHabTec         = document.getElementById('pillsHabTec');
+  el.inputHabTec         = document.getElementById('inputHabTec');
+  el.btnAddHabTec        = document.getElementById('btnAddHabTec');
+  
+  el.pillsHabBlandas     = document.getElementById('pillsHabBlandas');
+  el.inputHabBlandas     = document.getElementById('inputHabBlandas');
+  el.btnAddHabBlandas    = document.getElementById('btnAddHabBlandas');
+  
+  el.pillsIdiomas        = document.getElementById('pillsIdiomas');
+  el.inputIdiomaNombre   = document.getElementById('inputIdiomaNombre');
+  el.inputIdiomaNivel    = document.getElementById('inputIdiomaNivel');
+  el.btnAddIdioma        = document.getElementById('btnAddIdioma');
+  
+  el.formacionContainer  = document.getElementById('cvFormacionContainer');
+  el.btnAddFormacion     = document.getElementById('btnAddFormacion');
+  
+  el.globalPicPreview    = document.getElementById('globalPicPreview');
+  el.globalPicInput      = document.getElementById('globalPicInput');
+  el.btnDeletePic        = document.getElementById('btnDeletePic');
+
+  CV_FIELDS.forEach(f => {
+    fields[f.id] = document.getElementById(f.id);
+  });
+}
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -833,6 +835,7 @@ async function handlePasteCV() {
 // ── Inicialización ───────────────────────────────────────────────────────────
 
 export function init() {
+  cacheDOM();
   if (el.cvPrev) el.cvPrev.addEventListener('click', () => handleNavCarousel('prev'));
   if (el.cvNext) el.cvNext.addEventListener('click', () => handleNavCarousel('next'));
   

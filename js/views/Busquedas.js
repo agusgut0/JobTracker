@@ -11,12 +11,14 @@ import { showToast } from '../components/Toast.js';
 let activeRoleId = null;
 
 // ── Caché del DOM ────────────────────────────────────────────────────────────
-const el = {
-  roleTabs:   document.getElementById('roleTabs'),
-  roleInput:  document.getElementById('roleInput'),
-  btnAddRole: document.getElementById('btnAddRole'),
-  groupB:     document.getElementById('groupB'),
-};
+const el = {};
+
+function cacheDOM() {
+  el.roleTabs = document.getElementById('roleTabs');
+  el.roleInput = document.getElementById('roleInput');
+  el.btnAddRole = document.getElementById('btnAddRole');
+  el.groupB = document.getElementById('groupB');
+}
 
 /** Escapa strings para HTML */
 const esc = s => String(s)
@@ -114,6 +116,7 @@ function handleAddRole() {
  * @description Vincula los eventos de la vista Busquedas e inicializa el primer renderizado.
  */
 export function init() {
+  cacheDOM();
   if (el.roleTabs) {
     el.roleTabs.addEventListener('click', e => {
       const delBtn = e.target.closest('[data-role-del]');

@@ -17,27 +17,29 @@ const filters = {
 };
 
 // ── Caché del DOM ────────────────────────────────────────────────────────────
-const el = {
-  sTot:           document.getElementById('sTot'),
-  sPen:           document.getElementById('sPen'),
-  sApl:           document.getElementById('sApl'),
-  sEnt:           document.getElementById('sEnt'),
-  offerForm:      document.getElementById('offerForm'),
-  fPuesto:        document.getElementById('fPuesto'),
-  fEmpresa:       document.getElementById('fEmpresa'),
-  fLink:          document.getElementById('fLink'),
-  fDesc:          document.getElementById('fDesc'),
-  fEstado:        document.getElementById('fEstado'),
-  offerList:      document.getElementById('offerList'),
+const el = {};
+
+function cacheDOM() {
+  el.sTot          = document.getElementById('sTot');
+  el.sPen          = document.getElementById('sPen');
+  el.sApl          = document.getElementById('sApl');
+  el.sEnt          = document.getElementById('sEnt');
+  el.offerForm     = document.getElementById('offerForm');
+  el.fPuesto       = document.getElementById('fPuesto');
+  el.fEmpresa      = document.getElementById('fEmpresa');
+  el.fLink         = document.getElementById('fLink');
+  el.fDesc         = document.getElementById('fDesc');
+  el.fEstado       = document.getElementById('fEstado');
+  el.offerList     = document.getElementById('offerList');
   // Filters
-  filterPuesto:   document.getElementById('filterPuesto'),
-  filterEmpresa:  document.getElementById('filterEmpresa'),
-  filterEstado:   document.getElementById('filterEstado'),
+  el.filterPuesto  = document.getElementById('filterPuesto');
+  el.filterEmpresa = document.getElementById('filterEmpresa');
+  el.filterEstado  = document.getElementById('filterEstado');
   // Modals
-  modalDelete:    document.getElementById('modalDelete'),
-  modalCancel:    document.getElementById('modalCancelBtn'),
-  modalConfirm:   document.getElementById('modalConfirmBtn'),
-};
+  el.modalDelete   = document.getElementById('modalDelete');
+  el.modalCancel   = document.getElementById('modalCancelBtn');
+  el.modalConfirm  = document.getElementById('modalConfirmBtn');
+}
 
 const ESTADO_LABELS = {
   pendiente:  '🟠 Pendiente',
@@ -212,6 +214,7 @@ async function handleAIAction(jobId, type) {
 // ── Inicialización ───────────────────────────────────────────────────────────
 
 export function init() {
+  cacheDOM();
   // Bind filters
   if (el.filterPuesto) {
     el.filterPuesto.addEventListener('input', e => {

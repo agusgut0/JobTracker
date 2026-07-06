@@ -13,11 +13,31 @@ import * as ViewBusquedas from './views/Busquedas.js';
 import * as ViewAplicaciones from './views/Aplicaciones.js';
 import * as ViewMiCV from './views/MiCV.js';
 
-function bootstrap() {
+async function loadTabContent(tabId, htmlFile) {
+  try {
+    const response = await fetch(htmlFile);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const html = await response.text();
+    document.getElementById(tabId).innerHTML = html;
+  } catch (error) {
+    console.error(`Error loading ${htmlFile}:`, error);
+    document.getElementById(tabId).innerHTML = `<div class="card"><p style="color: red;">Error al cargar <b>${htmlFile}</b>.</p><p>Asegurate de estar corriendo la aplicación a través de un <b>servidor local</b> (como Live Server) y no directamente desde el archivo (file://).</p></div>`;
+  }
+}
+
+async function bootstrap() {
   // 1. Cargar persistencia (Memoria ← LocalStorage)
   load();
 
-  // 2. Inicializar Componentes Globales (Sidebar)
+  // 2. Cargar HTML dinámico de las secciones
+  await Promise.all([
+    loadTabContent('tab-inicio', 'inicio.html'),
+    loadTabContent('tab-busquedas', 'busquedas.html'),
+    loadTabContent('tab-aplicaciones', 'aplicaciones.html'),
+    loadTabContent('tab-micv', 'micv.html')
+  ]);
+
+  // 3. Inicializar Componentes Globales (Sidebar)
   Sidebar.bindTabNav((tabId) => {
     Sidebar.switchTab(tabId);
   });
@@ -49,7 +69,7 @@ function bootstrap() {
     }
   });
 
-  // 3. Inicializar Vistas Individuales
+  // 4. Inicializar Vistas Individuales
   ViewInicio.init();
   ViewBusquedas.init();
   ViewAplicaciones.init();

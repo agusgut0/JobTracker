@@ -1,0 +1,51 @@
+<div class="stats-grid" id="statsGrid">
+  <div class="stat-card"><span class="stat-num" id="sTot">0</span><span class="stat-lbl">Total</span></div>
+  <div class="stat-card"><span class="stat-num" id="sPen">0</span><span class="stat-lbl">Pendientes</span></div>
+  <div class="stat-card"><span class="stat-num" id="sApl">0</span><span class="stat-lbl">Aplicadas</span></div>
+  <div class="stat-card"><span class="stat-num" id="sEnt">0</span><span class="stat-lbl">Entrevistas</span></div>
+</div>
+<div class="card">
+  <h2 class="card-title">➕ Nueva oferta</h2>
+  <form id="offerForm" novalidate>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="fPuesto">Puesto *</label>
+        <input id="fPuesto" name="puesto" type="text" placeholder="Analista Funcional" required />
+      </div>
+      <div class="form-group">
+        <label for="fEmpresa">Empresa *</label>
+        <input id="fEmpresa" name="empresa" type="text" placeholder="Nombre empresa" required />
+      </div>
+      <div class="form-group full">
+        <label for="fLink">Link de la oferta</label>
+        <input id="fLink" name="link" type="url" placeholder="https://..." />
+      </div>
+      <div class="form-group full">
+        <label for="fDesc">Descripción / Requisitos</label>
+        <textarea id="fDesc" name="desc" placeholder="Pegá la descripción del puesto acá..."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="fEstado">Estado</label>
+        <select id="fEstado" name="estado">
+          <option value="pendiente">🟠 Pendiente</option>
+          <option value="aplicada">🟢 Aplicada</option>
+          <option value="entrevista">🔵 Entrevista</option>
+          <option value="descartada">🔴 Descartada</option>
+        </select>
+      </div>
+    </div>
+    <button type="submit" class="btn-primary">Guardar oferta</button>
+  </form>
+</div>
+<div class="filters-bar">
+  <input type="text" id="filterPuesto" class="filter-input" placeholder="🔍 Filtrar por puesto..." />
+  <input type="text" id="filterEmpresa" class="filter-input" placeholder="🏢 Filtrar por empresa..." />
+  <select id="filterEstado" class="filter-select">
+    <option value="todos">Todos los estados</option>
+    <option value="pendiente">🟠 Pendiente</option>
+    <option value="aplicada">🟢 Aplicada</option>
+    <option value="entrevista">🔵 Entrevista</option>
+    <option value="descartada">🔴 Descartada</option>
+  </select>
+</div>
+<div id="offerList"></div>
