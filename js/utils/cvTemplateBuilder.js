@@ -196,11 +196,11 @@ export function buildATSCurriculumHTML(cvData) {
 
         body {
             font-family: Arial, Helvetica, sans-serif;
-            font-size: 11pt;
+            font-size: 9pt;
             line-height: 1.5;
             color: var(--color-texto);
             margin: 0;
-            padding: 1.5cm;
+            padding: 0;
             background-color: white;
             box-sizing: border-box;
         }
@@ -276,6 +276,7 @@ export function buildATSCurriculumHTML(cvData) {
         /* FORMATO DEL CONTENIDO INTERNO */
         .exp-item {
             margin-bottom: 15px;
+            page-break-inside: avoid;
         }
 
         .exp-header {
@@ -306,7 +307,6 @@ export function buildATSCurriculumHTML(cvData) {
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            font-size: 12pt;
         }
 
         .form-title {
@@ -317,27 +317,32 @@ export function buildATSCurriculumHTML(cvData) {
         .form-dates {
             font-style: italic;
             color: var(--color-secundario);
-            font-size: 10pt;
             flex-shrink: 0;
             text-align: right;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-left">
-            ${cvData.profilePic ? `<img src="${cvData.profilePic}" class="profile-pic" alt="Perfil">` : `<div class="profile-pic"></div>`}
-        </div>
-        <div class="header-right">
-            <h1>${escapeHtml(nombre)}</h1>
-            <div class="role-title">${escapeHtml(rol)}</div>
-            <div class="contact-info">${contactString}</div>
-        </div>
-    </header>
+    <table style="width: 100%; border: none; border-collapse: collapse;">
+        <thead><tr><td style="height: 1.5cm; padding: 0; border: none;"></td></tr></thead>
+        <tbody><tr><td style="padding: 0 1.5cm; border: none;">
+            <header>
+                <div class="header-left">
+                    ${cvData.profilePic ? `<img src="${cvData.profilePic}" class="profile-pic" alt="Perfil">` : `<div class="profile-pic"></div>`}
+                </div>
+                <div class="header-right">
+                    <h1>${escapeHtml(nombre)}</h1>
+                    <div class="role-title">${escapeHtml(rol)}</div>
+                    <div class="contact-info">${contactString}</div>
+                </div>
+            </header>
 
-    <main>
-        ${contentHtml}
-    </main>
+            <main>
+                ${contentHtml}
+            </main>
+        </td></tr></tbody>
+        <tfoot><tr><td style="height: 1.5cm; padding: 0; border: none;"></td></tr></tfoot>
+    </table>
 </body>
 </html>`;
 }
