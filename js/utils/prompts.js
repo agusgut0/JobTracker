@@ -25,18 +25,18 @@ ${job.desc || '(sin descripción proporcionada)'}`.trim();
 function formatCVForPrompt(cvData) {
   const sections = [];
 
-  if (cvData.nombre)   sections.push(`NOMBRE: ${cvData.nombre}`);
-  if (cvData.rol)      sections.push(`ROL / PUESTO ACTUAL: ${cvData.rol}`);
+  if (cvData.nombre) sections.push(`NOMBRE: ${cvData.nombre}`);
+  if (cvData.rol) sections.push(`ROL / PUESTO ACTUAL: ${cvData.rol}`);
 
   // Contact info
   const contactParts = [];
-  if (cvData.email)     contactParts.push(`Email: ${cvData.email}`);
-  if (cvData.telefono)  contactParts.push(`Teléfono: ${cvData.telefono}`);
-  if (cvData.linkedin)  contactParts.push(`LinkedIn: ${cvData.linkedin}`);
+  if (cvData.email) contactParts.push(`Email: ${cvData.email}`);
+  if (cvData.telefono) contactParts.push(`Teléfono: ${cvData.telefono}`);
+  if (cvData.linkedin) contactParts.push(`LinkedIn: ${cvData.linkedin}`);
   if (cvData.portfolio) contactParts.push(`Portfolio: ${cvData.portfolio}`);
   if (contactParts.length) sections.push(`DATOS DE CONTACTO:\n${contactParts.join('\n')}`);
 
-  if (cvData.resumen)            sections.push(`RESUMEN PROFESIONAL:\n${cvData.resumen}`);
+  if (cvData.resumen) sections.push(`RESUMEN PROFESIONAL:\n${cvData.resumen}`);
 
   // Experiencia: soporta array estructurado y string legacy
   if (cvData.experiencia) {
@@ -64,7 +64,7 @@ function formatCVForPrompt(cvData) {
     const arr = Array.isArray(cvData.habilidadesTec) ? cvData.habilidadesTec : [cvData.habilidadesTec];
     if (arr.length && arr.some(Boolean)) sections.push(`HABILIDADES TÉCNICAS:\n${arr.join(', ')}`);
   }
-  
+
   if (cvData.formacion) {
     if (Array.isArray(cvData.formacion) && cvData.formacion.length > 0) {
       const formBlocks = cvData.formacion.map(form => {
@@ -81,12 +81,12 @@ function formatCVForPrompt(cvData) {
       sections.push(`FORMACIÓN ACADÉMICA:\n${cvData.formacion}`);
     }
   }
-  
+
   if (cvData.habilidadesBlandas) {
     const arr = Array.isArray(cvData.habilidadesBlandas) ? cvData.habilidadesBlandas : [cvData.habilidadesBlandas];
     if (arr.length && arr.some(Boolean)) sections.push(`HABILIDADES BLANDAS:\n${arr.join(', ')}`);
   }
-  
+
   if (cvData.idiomas) {
     let idStr = '';
     if (Array.isArray(cvData.idiomas) && cvData.idiomas.length > 0) {
@@ -151,59 +151,65 @@ export function promptAdaptarCV(job, cvData) {
 
   return `Actuá como un experto en Redacción de CVs de Alto Impacto para el sector IT y especialista en optimización de algoritmos ATS (Applicant Tracking Systems). 
 
-Tu objetivo es adaptar de forma estratégica el CV del candidato para la oferta laboral provista, maximizando el "Keyword Match" sin caer en prácticas de spam y manteniendo la autenticidad del perfil.
+Tu objetivo es adaptar de forma estratégica el CV del candidato para la oferta laboral provista, maximizando el "Keyword Match" mediante la homologación de tecnologías equivalentes, sin caer en prácticas de spam y manteniendo la estricta autenticidad del perfil.
 
 === REGLAS ESTRICTAS DE NEGOCIO ===
-1. PROHIBIDO INVENTAR: No agregues tecnologías, herramientas, años de experiencia o roles que el candidato no mencione en su CV original.
+1. PROHIBIDO INVENTAR: No agregues tecnologías, herramientas o roles que el candidato no domine en absoluto. Sin embargo, SI la oferta pide una tecnología que el candidato no tiene, pero el candidato posee una EQUIVALENTE directa (ej. pide SQLite y tiene MySQL, pide Vue y tiene React), debés aplicar la REGLA DE HOMOLOGACIÓN (ver Regla 4).
 2. LIMITACIÓN DE MÉTRICAS: Si el CV original no tiene métricas numéricas, no las inventes. En su lugar, usá la estructura de impacto: "Acción (Verbo) + Contexto Técnico + Resultado/Propósito" (Método XYZ de Google).
 3. TONO: Profesional, técnico, directo y orientado al logro. Evitá adjetivos vacíos como "motivado", "proactivo" o "apasionado".
+4. REGLA DE HOMOLOGACIÓN PARA ATS: Para no perder palabras clave críticas de la oferta, agrupá las tecnologías por conceptos generales. Si la oferta pide un motor o framework específico que el candidato no tiene pero maneja su equivalente conceptual, reflejá esa equivalencia aclarando el nivel (ej: "Bases de Datos Relacionales: MySQL / SQLite [nociones]" o "Frameworks Frontend: React (Avanzado) / Vue [adaptabilidad]").
 
-=== CV ORIGINAL (${candidateName}) ===
-${cvBlock}
+=== CV ORIGINAL (\${candidateName}) ===
+\${cvBlock}
 
 === OFERTA LABORAL ===
-${ofertaBlock(job)}
+\${ofertaBlock(job)}
 
-Analizá ambas fuentes y devolvé la información estructurada bajo el siguiente formato:
+=== INSTRUCCIONES DE FORMATO Y SALIDA ===
+Analizá ambas fuentes y devolvé la información adaptada **ÚNICA Y EXCLUSIVAMENTE** en un bloque de código JSON válido, sin textos introductorios ni explicaciones posteriores. 
 
-### 1. Diagnóstico de Adaptación (Breve)
-* **Keywords Críticas Insertadas:** [Lista de 5-7 términos técnicos o metodologías de la oferta que se incorporaron orgánicamente].
-* **Estrategia de Descarte:** [Qué proyectos o tecnologías secundarias del CV original sugerís pasar a segundo plano o resumir para que no hagan "ruido" visual en esta postulación].
+El JSON debe respetar estrictamente la siguiente estructura de tipos y campos:
 
-### 2. Resumen Profesional Optimizado (Máx. 4 líneas)
-TITULO: [Escribi el rol técnico del puesto solicitante haciendolo concordar con la experiencia del usuario]
-[Escribí un párrafo compacto que responda: Qué es (Rol técnico) + Cuánta experiencia/Seniority tiene + Stack principal relevante para la oferta + Mayor valor que aporta para resolver el problema de la empresa].
-
-### 3. Core Skills Reordenadas
-* **Technical Skills (Relevantes para el puesto):** [Tecnologías ordenadas de Mayor a Menor importancia según la oferta].
-* **Tools & Methodologies:** [Herramientas, metodologías ágiles o ERPs críticos para este rol].
-
-### 4. Bloque de Experiencia Rediseñado (Los 4-6 bullets más potentes)
-[Reescribí los bullets de los trabajos más relevantes usando verbos de acción fuertes en primera persona del pasado (ej: "Diseñé", "Optimicé", "Implementé"). Asegurate de que la tecnología de la oferta aparezca en el contexto de la acción].
-
-### 5. CV Completo Reestructurado (Listo para copiar)
-[Generá la versión final unificada del CV utilizando los datos de contacto del original e integrando las optimizaciones previas. Excluí tablas u otros elementos visuales complejos. El formato debe seguir estrictamente este orden y diseño en Markdown limpio]:
-
-# [NOMBRE Y APELLIDO DEL CANDIDATO]
-[Datos de contacto: Email | LinkedIn | Teléfono | Ubicación]
-
-## Perfil profesional
-[Inserta el título del rol]
-[Insertar acá el párrafo del Resumen Profesional Optimizado generado en el punto 2].
-
-## Experiencia Laboral
-[Estructurar de forma cronológica inversa: **Puesto** - Empresa (Mes/Año Inicio - Mes/Año Fin o Actualidad). Incorporar debajo de cada rol los bullets de impacto técnico diseñados en el punto 4].
-
-## Formación académica
-[Listar títulos, instituciones y estado/fechas extraídos estrictamente del CV original].
-
-## Habilidades técnicas
-* **Lenguajes y Tecnologías:** [Listado limpio de tecnologías relevantes priorizadas para el puesto].
-* **Sistemas y Herramientas:** [ERPs, plataformas de automatización, bases de datos o software específico del CV que aplique al rol].
-
-## Habilidades blandas & Idiomas
-* **Habilidades Blandas:** [Máximo 4 competencias interpersonales o metodológicas demostradas implícitamente en la experiencia del candidato, sin usar clichés].
-* **Idiomas:** [Listar idiomas y niveles según el CV original].`;
+{
+  "nombre": "[Nombre y Apellido del candidato extraído del CV]",
+  "rol": "[Título del rol técnico del puesto solicitado, haciéndolo concordar con la experiencia del usuario]",
+  "email": "[Email del candidato]",
+  "telefono": "[Teléfono del candidato]",
+  "linkedin": "[Enlace o usuario de LinkedIn]",
+  "portfolio": "[Enlace a GitHub o Portfolio si aplica, sino string vacío]",
+  "resumen": "[Escribí un párrafo compacto de máx 4 líneas que responda: Qué es + Cuánta experiencia tiene + Stack principal relevante + Capacidad de trasladar su conocimiento a las tecnologías equivalentes requeridas por la oferta (ej: 'con sólida base en MySQL y capacidad de adaptación inmediata a entornos SQLite')]",
+  "experiencia": [
+    {
+      "rol": "[Puesto o Cargo adaptado formalmente]",
+      "lugar": "[Empresa u Organización]",
+      "fechaInicio": "[Fecha en formato YYYY-MM o según CV original]",
+      "fechaFin": "[Fecha en formato YYYY-MM o vacío si es actualidad]",
+      "actualidad": [true o false según corresponda],
+      "descripcion": "[Generá una lista HTML con etiquetas <ul><li>...</li></ul> que contenga entre 3 y 5 bullets de impacto técnico reescritos. Usá verbos de acción fuertes en primera persona del pasado. Resaltá las tecnologías clave usando la etiqueta <strong>. Si aplica, mencioná cómo la tecnología base del candidato se relaciona con la requerida]"
+    }
+  ],
+  "habilidadesTec": [
+    "[Lista de tecnologías ordenadas de Mayor a Menor importancia según la oferta. Cuando mapees equivalencias, usá el formato conceptual de la Regla 4 (ej: 'Motores Relacionales (MySQL, SQLite)') para pasar los filtros de los ATS sin mentir]"
+  ],
+  "formacion": [
+    {
+      "titulo": "[Título académico o certificación]",
+      "institucion": "[Universidad o Academia]",
+      "fechaInicio": "[Fecha de inicio o string vacío]",
+      "fechaFin": "[Fecha de fin o string vacío]",
+      "actualidad": [true o false]
+    }
+  ],
+  "habilidadesBlandas": [
+    "[Máximo 4 competencias interpersonales o metodológicas demostradas implícitamente en la experiencia, sin usar clichés]"
+  ],
+  "idiomas": [
+    {
+      "nombre": "[Idioma]",
+      "nivel": "[Nivel alcanzado según el CV original]"
+    }
+  ]
+}`;
 }
 
 // ── Prompt: Crear Carta de Presentación ─────────────────────────────────────
