@@ -28,6 +28,8 @@ const el = {
   btnSaveCV:           document.getElementById('btnSaveCV'),
   btnDeleteCV:         document.getElementById('btnDeleteCV'),
   btnDownloadCV:       document.getElementById('btnDownloadCV'),
+  btnCopyCV:           document.getElementById('btnCopyCV'),
+  btnPasteCV:          document.getElementById('btnPasteCV'),
   expContainer:        document.getElementById('cvExperienciaContainer'),
   btnAddExp:           document.getElementById('btnAddExp'),
   
@@ -800,6 +802,34 @@ function initPhoneValidation() {
   }
 }
 
+async function handleCopyCV() {
+  const data = collectCVData();
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+    showToast('📋 Datos del CV copiados al portapapeles.');
+  } catch (err) {
+    showToast('⚠️ No se pudo copiar al portapapeles.');
+  }
+}
+
+async function handlePasteCV() {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (!text) throw new Error("Portapapeles vacío");
+    const data = JSON.parse(text);
+    if (data && (data.nombre !== undefined || data.rol !== undefined || data.experiencia !== undefined)) {
+      setCVData(data);
+      saveCVSlot(collectCVData());
+      refresh();
+      showToast('📥 Datos del CV pegados e importados correctamente.');
+    } else {
+      showToast('⚠️ El formato JSON no parece ser un CV válido.');
+    }
+  } catch (err) {
+    showToast('⚠️ No se pudo leer un JSON válido del portapapeles.');
+  }
+}
+
 // ── Inicialización ───────────────────────────────────────────────────────────
 
 export function init() {
@@ -809,6 +839,8 @@ export function init() {
   if (el.btnSaveCV) el.btnSaveCV.addEventListener('click', handleSaveCV);
   if (el.btnDeleteCV) el.btnDeleteCV.addEventListener('click', handleDeleteCV);
   if (el.btnDownloadCV) el.btnDownloadCV.addEventListener('click', handleDownloadCV);
+  if (el.btnCopyCV) el.btnCopyCV.addEventListener('click', handleCopyCV);
+  if (el.btnPasteCV) el.btnPasteCV.addEventListener('click', handlePasteCV);
   if (el.btnAddExp) el.btnAddExp.addEventListener('click', handleAddExperience);
 
   // Pills handlers

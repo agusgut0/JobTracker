@@ -343,9 +343,13 @@
         </div>
 
         <div class="card">
-          <h2 class="card-title">📄 Descargar CV</h2>
-          <p class="hint-text">Generá un archivo PDF con tus datos usando un formato optimizado para ATS.</p>
-          <button id="btnDownloadCV" class="btn-export">📄 Descargar Mi CV (PDF)</button>
+          <h2 class="card-title">📄 Generación y Portabilidad</h2>
+          <p class="hint-text">Exportá a PDF o copiá los datos en formato JSON para pegarlos en otro CV (ideal para adaptar CVs con IA).</p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="btnDownloadCV" class="btn-export">📄 Descargar (PDF)</button>
+            <button id="btnCopyCV" class="btn-export" style="background-color: var(--surface); color: var(--accent); border: 1.5px solid var(--accent);">📋 Copiar Datos (JSON)</button>
+            <button id="btnPasteCV" class="btn-export" style="background-color: var(--surface); color: var(--accent); border: 1.5px solid var(--accent);">📥 Pegar Datos (JSON)</button>
+          </div>
         </div>
 
         <!-- CV ACTION BUTTONS -->
