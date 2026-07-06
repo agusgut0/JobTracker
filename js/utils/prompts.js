@@ -177,11 +177,11 @@ Tu objetivo es adaptar de forma estratégica el CV del candidato para la oferta 
 3. TONO: Profesional, técnico, directo y orientado al logro. Evitá adjetivos vacíos como "motivado", "proactivo" o "apasionado".
 4. REGLA DE HOMOLOGACIÓN PARA ATS: Para no perder palabras clave críticas de la oferta, agrupá las tecnologías por conceptos generales. Si la oferta pide un motor o framework específico que el candidato no tiene pero maneja su equivalente conceptual, reflejá esa equivalencia aclarando el nivel (ej: "Bases de Datos Relacionales: MySQL / SQLite [nociones]" o "Frameworks Frontend: React (Avanzado) / Vue [adaptabilidad]").
 
-=== CV ORIGINAL (\${candidateName}) ===
-\${cvBlock}
+=== CV ORIGINAL (${candidateName}) ===
+${cvBlock}
 
 === OFERTA LABORAL ===
-\${ofertaBlock(job)}
+${ofertaBlock(job)}
 
 === INSTRUCCIONES DE FORMATO Y SALIDA ===
 Analizá ambas fuentes y devolvé la información adaptada **ÚNICA Y EXCLUSIVAMENTE** en un bloque de código JSON válido, sin textos introductorios ni explicaciones posteriores. 
