@@ -247,6 +247,22 @@
           <button class="cv-carousel-btn" id="cvNext" title="CV siguiente">›</button>
         </div>
 
+        <!-- GLOBAL PROFILE PIC -->
+        <div class="card">
+          <h2 class="card-title">📸 Foto de Perfil Global</h2>
+          <p class="hint-text">Esta foto se aplicará automáticamente a todos tus CVs impresos.</p>
+          <div class="profile-pic-upload-container">
+            <div class="profile-pic-preview" id="globalPicPreview">
+              <span class="pic-placeholder-text">Sin foto</span>
+            </div>
+            <div class="profile-pic-actions">
+              <label for="globalPicInput" class="btn-sm btn-upload">Subir foto (.jpg, .png)</label>
+              <input type="file" id="globalPicInput" accept="image/png, image/jpeg, image/jpg" style="display: none;" />
+              <button type="button" class="btn-sm btn-delete-pic" id="btnDeletePic" style="display: none;">Eliminar foto</button>
+            </div>
+          </div>
+        </div>
+
         <div class="card">
           <h2 class="card-title">📄 Mi perfil profesional</h2>
           <p class="hint-text">✏️ Completá los campos y presioná "Guardar CV" para almacenar este perfil.</p>
@@ -281,36 +297,55 @@
                 placeholder="Breve párrafo que resuma tu perfil, experiencia y valor diferencial..."></textarea>
             </div>
             <div class="form-group full">
-              <label for="cvExperiencia">Experiencia laboral</label>
-              <textarea id="cvExperiencia" class="cv-textarea" spellcheck="false"
-                placeholder="Describí tus experiencias laborales, roles, empresas, logros..."></textarea>
+              <label>Experiencia laboral</label>
+              <div id="cvExperienciaContainer" class="exp-container"></div>
+              <button type="button" id="btnAddExp" class="btn-add-exp">+ Añadir experiencia</button>
             </div>
             <div class="form-group full">
-              <label for="cvHabilidadesTec">Habilidades técnicas</label>
-              <textarea id="cvHabilidadesTec" spellcheck="false"
-                placeholder="Ej: Python, JavaScript, SQL, ERP Totvs..."></textarea>
+              <label>Habilidades técnicas</label>
+              <div class="pill-input-container">
+                <input id="inputHabTec" type="text" placeholder="Ej: Python (presioná Enter)" />
+                <button type="button" id="btnAddHabTec" class="btn-add-pill">+</button>
+              </div>
+              <div id="pillsHabTec" class="pills-container"></div>
             </div>
             <div class="form-group full">
-              <label for="cvFormacion">Formación académica</label>
-              <textarea id="cvFormacion" spellcheck="false"
-                placeholder="Ej: Ingeniería en Sistemas — UTN (2021 - Actualidad)..."></textarea>
+              <label>Formación académica</label>
+              <div id="cvFormacionContainer" class="exp-container"></div>
+              <button type="button" id="btnAddFormacion" class="btn-add-exp">+ Añadir formación</button>
             </div>
             <div class="form-group full">
-              <label for="cvHabilidadesBlandas">Habilidades blandas</label>
-              <textarea id="cvHabilidadesBlandas" spellcheck="false"
-                placeholder="Ej: Trabajo en equipo, comunicación, resolución de problemas..."></textarea>
+              <label>Habilidades blandas</label>
+              <div class="pill-input-container">
+                <input id="inputHabBlandas" type="text" placeholder="Ej: Trabajo en equipo (presioná Enter)" />
+                <button type="button" id="btnAddHabBlandas" class="btn-add-pill">+</button>
+              </div>
+              <div id="pillsHabBlandas" class="pills-container"></div>
             </div>
             <div class="form-group full">
-              <label for="cvIdiomas">Idiomas</label>
-              <input id="cvIdiomas" type="text" placeholder="Ej: Español nativo, Inglés B2" />
+              <label>Idiomas</label>
+              <div class="lang-input-container">
+                <input id="inputIdiomaNombre" type="text" placeholder="Ej: Inglés" />
+                <select id="inputIdiomaNivel" class="lang-select">
+                  <option value="A1">A1</option>
+                  <option value="A2">A2</option>
+                  <option value="B1">B1</option>
+                  <option value="B2" selected>B2</option>
+                  <option value="C1">C1</option>
+                  <option value="C2">C2</option>
+                  <option value="Nativo">Nativo</option>
+                </select>
+                <button type="button" id="btnAddIdioma" class="btn-add-pill">+</button>
+              </div>
+              <div id="pillsIdiomas" class="pills-container"></div>
             </div>
           </div>
         </div>
 
         <div class="card">
           <h2 class="card-title">📄 Descargar CV</h2>
-          <p class="hint-text">Generá un archivo .docx con tus datos usando la plantilla profesional integrada.</p>
-          <button id="btnDownloadCV" class="btn-export">📄 Descargar Mi CV (.docx)</button>
+          <p class="hint-text">Generá un archivo PDF con tus datos usando un formato optimizado para ATS.</p>
+          <button id="btnDownloadCV" class="btn-export">📄 Descargar Mi CV (PDF)</button>
         </div>
 
         <!-- CV ACTION BUTTONS -->
@@ -339,8 +374,6 @@
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.7/pizzip.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <script type="module" src="js/app.js"></script>
 </body>
 

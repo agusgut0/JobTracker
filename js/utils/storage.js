@@ -4,6 +4,8 @@
  * Actúa como la única fuente de la verdad (Single Source of Truth) para la aplicación.
  */
 
+import { openDB } from 'https://cdn.jsdelivr.net/npm/idb@8/+esm';
+
 const STORAGE_KEY_JOBS  = 'jobtracker_applications';
 const STORAGE_KEY_CV    = 'jobtracker_cv';
 const STORAGE_KEY_ROLES = 'jt_roles';
@@ -18,11 +20,11 @@ const CV_DEFAULT = {
   linkedin:          '',
   portfolio:         '',
   resumen:           '',
-  experiencia:       '',
-  habilidadesTec:    '',
-  formacion:         '',
-  habilidadesBlandas:'',
-  idiomas:           '',
+  experiencia:       [],
+  habilidadesTec:    [],
+  formacion:         [],
+  habilidadesBlandas:[],
+  idiomas:           [],
 };
 
 // ── Estado Interno en Memoria ────────────────────────────────────────────────
@@ -50,6 +52,103 @@ function persistCV() {
 /** Guarda los roles del usuario en LocalStorage. */
 function persistRoles() {
   localStorage.setItem(STORAGE_KEY_ROLES, JSON.stringify(userRoles));
+}
+
+// ── IndexedDB (Fotos) ────────────────────────────────────────────────────────
+
+const DB_NAME = 'JobTrackerDB';
+const DB_VERSION = 1;
+const STORE_NAME = 'files';
+const PIC_KEY = 'globalProfilePic';
+
+let dbPromise = null;
+
+function getDB() {
+  if (!dbPromise) {
+    dbPromise = openDB(DB_NAME, DB_VERSION, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME);
+        }
+      },
+    });
+  }
+  return dbPromise;
+}
+
+export async function getProfilePic() {
+  const db = await getDB();
+  return db.get(STORE_NAME, PIC_KEY);
+}
+
+export async function saveProfilePic(base64Data) {
+  const db = await getDB();
+  await db.put(STORE_NAME, base64Data, PIC_KEY);
+}
+
+export async function deleteProfilePic() {
+  const db = await getDB();
+  await db.delete(STORE_NAME, PIC_KEY);
+}
+
+// ── Migración Legacy ─────────────────────────────────────────────────────────
+
+/**
+ * @function migrateExperiencia
+ * @description Convierte experiencia legacy (string) al formato nuevo (array de objetos).
+ * @param {string} text Texto plano de experiencia.
+ * @returns {Array} Array de objetos de experiencia.
+ */
+function migrateExperiencia(text) {
+  if (!text || !text.trim()) return [];
+  return [{
+    lugar: '',
+    rol: '',
+    fechaInicio: '',
+    fechaFin: '',
+    actualidad: false,
+    descripcion: text.trim(),
+  }];
+}
+
+/**
+ * @function migrateFormacion
+ * @description Convierte formacion legacy (string) al formato nuevo (array de objetos).
+ */
+function migrateFormacion(text) {
+  if (!text || !text.trim()) return [];
+  return [{
+    institucion: '',
+    titulo: text.trim(),
+    fechaInicio: '',
+    fechaFin: '',
+    actualidad: false
+  }];
+}
+
+/**
+ * @function migrateStringToArray
+ * @description Convierte texto plano (separado por comas/saltos/barras) en array.
+ */
+function migrateStringToArray(text) {
+  if (!text || typeof text !== 'string') return Array.isArray(text) ? text : [];
+  return text.split(/[\n|,]+/).map(s => s.trim()).filter(Boolean);
+}
+
+/**
+ * @function migrateIdiomas
+ * @description Convierte idiomas string a array de objetos {nombre, nivel}.
+ */
+function migrateIdiomas(text) {
+  if (!text || typeof text !== 'string') return Array.isArray(text) ? text : [];
+  const items = text.split(/[\n|,]+/).map(s => s.trim()).filter(Boolean);
+  return items.map(item => {
+    const match = item.match(/(.+?)\s*\(?([A-C][1-2]|Nativo)\)?$/i);
+    if (match) {
+      return { nombre: match[1].trim(), nivel: match[2].trim() };
+    }
+    return { nombre: item, nivel: 'A confirmar' };
+  });
 }
 
 // ── Inicialización ───────────────────────────────────────────────────────────
@@ -81,7 +180,7 @@ export function load() {
           ? parsed.activeIndex : 0;
       } else if (typeof parsed === 'string') {
         cvSlots = new Array(MAX_CV_SLOTS).fill(null);
-        cvSlots[0] = { ...CV_DEFAULT, experiencia: parsed };
+        cvSlots[0] = { ...CV_DEFAULT, experiencia: migrateExperiencia(parsed) };
         activeCVIndex = 0;
       } else if (typeof parsed === 'object' && !Array.isArray(parsed)) {
         cvSlots = new Array(MAX_CV_SLOTS).fill(null);
@@ -92,6 +191,27 @@ export function load() {
   } catch {
     cvSlots = new Array(MAX_CV_SLOTS).fill(null);
     activeCVIndex = 0;
+  }
+
+  // Migrar datos legacy (string → array) en todos los slots
+  for (let i = 0; i < cvSlots.length; i++) {
+    if (cvSlots[i]) {
+      if (typeof cvSlots[i].experiencia === 'string') {
+        cvSlots[i].experiencia = migrateExperiencia(cvSlots[i].experiencia);
+      }
+      if (typeof cvSlots[i].formacion === 'string') {
+        cvSlots[i].formacion = migrateFormacion(cvSlots[i].formacion);
+      }
+      if (typeof cvSlots[i].habilidadesTec === 'string') {
+        cvSlots[i].habilidadesTec = migrateStringToArray(cvSlots[i].habilidadesTec);
+      }
+      if (typeof cvSlots[i].habilidadesBlandas === 'string') {
+        cvSlots[i].habilidadesBlandas = migrateStringToArray(cvSlots[i].habilidadesBlandas);
+      }
+      if (typeof cvSlots[i].idiomas === 'string') {
+        cvSlots[i].idiomas = migrateIdiomas(cvSlots[i].idiomas);
+      }
+    }
   }
 
   // Roles
@@ -273,7 +393,9 @@ export function deleteRole(id) {
  * @description Descarga un backup completo en formato JSON unificando la persistencia.
  * @returns {number} Cantidad de postulaciones exportadas.
  */
-export function exportJSON() {
+export async function exportJSON() {
+  const profilePic = await getProfilePic();
+  
   const payload = {
     version:    6,
     exportedAt: new Date().toISOString(),
@@ -282,6 +404,7 @@ export function exportJSON() {
       activeIndex: activeCVIndex,
       slots: cvSlots,
     },
+    jobtracker_profilePic: profilePic || null,
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
@@ -350,7 +473,34 @@ export function importJSON(file) {
           hasCV = true;
         }
 
-        resolve({ jobCount: jobs.length, hasCV });
+        // Apply migrations to imported slots
+        for (let i = 0; i < cvSlots.length; i++) {
+          if (cvSlots[i]) {
+            if (typeof cvSlots[i].experiencia === 'string') {
+              cvSlots[i].experiencia = migrateExperiencia(cvSlots[i].experiencia);
+            }
+            if (typeof cvSlots[i].formacion === 'string') {
+              cvSlots[i].formacion = migrateFormacion(cvSlots[i].formacion);
+            }
+            if (typeof cvSlots[i].habilidadesTec === 'string') {
+              cvSlots[i].habilidadesTec = migrateStringToArray(cvSlots[i].habilidadesTec);
+            }
+            if (typeof cvSlots[i].habilidadesBlandas === 'string') {
+              cvSlots[i].habilidadesBlandas = migrateStringToArray(cvSlots[i].habilidadesBlandas);
+            }
+            if (typeof cvSlots[i].idiomas === 'string') {
+              cvSlots[i].idiomas = migrateIdiomas(cvSlots[i].idiomas);
+            }
+          }
+        }
+
+        if (parsed.jobtracker_profilePic) {
+          saveProfilePic(parsed.jobtracker_profilePic).then(() => {
+            resolve({ jobCount: jobs.length, hasCV });
+          }).catch(() => resolve({ jobCount: jobs.length, hasCV }));
+        } else {
+          resolve({ jobCount: jobs.length, hasCV });
+        }
       } catch (err) {
         reject(new Error('JSON inválido'));
       }

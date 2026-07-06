@@ -940,6 +940,284 @@ textarea { resize: vertical; min-height: 72px; }
 
 .cv-textarea:focus { border-color: var(--accent); }
 
+/* ── EXPERIENCE SUB-FORM ─────────────────────────────────────── */
+.exp-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.exp-card {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  overflow: hidden;
+  animation: expFadeIn .28s ease both;
+}
+
+@keyframes expFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.exp-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition);
+}
+
+.exp-card-header:hover {
+  background: var(--accent-light);
+}
+
+.exp-card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.exp-card-toggle {
+  font-size: .75rem;
+  color: var(--text-3);
+  transition: transform .2s ease;
+  flex-shrink: 0;
+}
+
+.exp-card.collapsed .exp-card-toggle {
+  transform: rotate(-90deg);
+}
+
+.exp-card-label {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.exp-card-dates {
+  font-size: .68rem;
+  color: var(--text-3);
+  margin-left: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-exp-delete {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.btn-exp-delete:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: var(--red-light);
+}
+
+.exp-card-body {
+  padding: 14px;
+  transition: max-height .3s ease, padding .3s ease, opacity .2s ease;
+  max-height: 800px;
+  opacity: 1;
+}
+
+.exp-card.collapsed .exp-card-body {
+  max-height: 0;
+  padding: 0 14px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.exp-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.exp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.exp-field.full {
+  grid-column: 1 / -1;
+}
+
+.exp-field label {
+  font-size: .7rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.exp-date-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.exp-date-row input[type="month"] {
+  flex: 1;
+  min-width: 0;
+}
+
+.exp-date-row input[type="month"]:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.exp-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: .72rem;
+  font-weight: 500;
+  color: var(--text-2);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.exp-checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Rich text editor */
+.exp-richtext-wrapper {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface);
+  transition: border-color var(--transition);
+}
+
+.exp-richtext-wrapper:focus-within {
+  border-color: var(--accent);
+}
+
+.exp-richtext-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 6px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.exp-toolbar-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: .78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  font-family: var(--font-body);
+}
+
+.exp-toolbar-btn:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.exp-toolbar-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.exp-toolbar-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  margin: 0 3px;
+}
+
+.exp-richtext-editor {
+  min-height: 90px;
+  padding: 8px 10px;
+  font-family: var(--font-body);
+  font-size: .8rem;
+  color: var(--text);
+  line-height: 1.6;
+  outline: none;
+  background: var(--surface);
+  overflow-y: auto;
+  max-height: 240px;
+}
+
+.exp-richtext-editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+.exp-richtext-editor ul,
+.exp-richtext-editor ol {
+  padding-left: 20px;
+  margin: 4px 0;
+}
+
+.exp-richtext-editor li {
+  margin-bottom: 2px;
+}
+
+/* Add experience button */
+.btn-add-exp {
+  width: 100%;
+  padding: 10px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-3);
+  font-family: var(--font-body);
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 4px;
+}
+
+.btn-add-exp:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-light);
+}
+
+@media (max-width: 640px) {
+  .exp-fields { grid-template-columns: 1fr; }
+  .exp-field.full { grid-column: 1; }
+  .exp-date-row { flex-wrap: wrap; }
+}
+
 /* ── CV CAROUSEL ─────────────────────────────────────────────── */
 .cv-carousel {
   display: flex;
@@ -1166,6 +1444,136 @@ textarea { resize: vertical; min-height: 72px; }
 .btn-modal-cancel:hover { background: var(--surface-2); }
 .btn-modal-confirm { background: var(--red); border: 1.5px solid var(--red); color: #fff; }
 .btn-modal-confirm:hover { opacity: .88; }
+
+/* ── PILLS & LANG FORMS ──────────────────────────────────────── */
+.pill-input-container, .lang-input-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.lang-select {
+  width: auto;
+  min-width: 80px;
+}
+
+.btn-add-pill {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.btn-add-pill:hover {
+  opacity: .85;
+}
+
+.pills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: .75rem;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.pill-delete {
+  cursor: pointer;
+  font-weight: bold;
+  font-size: .8rem;
+  color: var(--text-3);
+  transition: color var(--transition);
+}
+
+.pill-delete:hover {
+  color: var(--red);
+}
+
+/* ── PROFILE PIC ─────────────────────────────────────────────── */
+.profile-pic-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.profile-pic-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px dashed var(--text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.pic-placeholder-text {
+  font-size: .65rem;
+  color: var(--text-3);
+  text-transform: uppercase;
+  font-weight: 600;
+  text-align: center;
+}
+
+.profile-pic-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.btn-upload {
+  display: inline-block;
+  background: var(--surface);
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: .75rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--transition);
+}
+
+.btn-upload:hover {
+  background: var(--accent-light);
+}
+
+.btn-delete-pic {
+  background: transparent;
+  border: 1.5px solid transparent;
+  color: var(--red);
+  padding: 6px 12px;
+}
+
+.btn-delete-pic:hover {
+  background: var(--red-light);
+  border-radius: 6px;
+}
 
 /* ── RESPONSIVE ──────────────────────────────────────────────── */
 @media (max-width: 860px) {

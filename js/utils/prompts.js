@@ -37,11 +37,65 @@ function formatCVForPrompt(cvData) {
   if (contactParts.length) sections.push(`DATOS DE CONTACTO:\n${contactParts.join('\n')}`);
 
   if (cvData.resumen)            sections.push(`RESUMEN PROFESIONAL:\n${cvData.resumen}`);
-  if (cvData.experiencia)        sections.push(`EXPERIENCIA LABORAL:\n${cvData.experiencia}`);
-  if (cvData.habilidadesTec)     sections.push(`HABILIDADES TÉCNICAS:\n${cvData.habilidadesTec}`);
-  if (cvData.formacion)          sections.push(`FORMACIÓN ACADÉMICA:\n${cvData.formacion}`);
-  if (cvData.habilidadesBlandas) sections.push(`HABILIDADES BLANDAS:\n${cvData.habilidadesBlandas}`);
-  if (cvData.idiomas)            sections.push(`IDIOMAS: ${cvData.idiomas}`);
+
+  // Experiencia: soporta array estructurado y string legacy
+  if (cvData.experiencia) {
+    if (Array.isArray(cvData.experiencia) && cvData.experiencia.length > 0) {
+      const expBlocks = cvData.experiencia.map(exp => {
+        const parts = [];
+        if (exp.rol) parts.push(`Rol: ${exp.rol}`);
+        if (exp.lugar) parts.push(`Empresa: ${exp.lugar}`);
+        const start = exp.fechaInicio || '';
+        const end = exp.actualidad ? 'Actualidad' : (exp.fechaFin || '');
+        if (start || end) parts.push(`Período: ${[start, end].filter(Boolean).join(' – ')}`);
+        if (exp.descripcion) {
+          // Strip HTML tags for prompt
+          const plain = exp.descripcion.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+          if (plain) parts.push(`Descripción: ${plain}`);
+        }
+        return parts.join('\n');
+      });
+      sections.push(`EXPERIENCIA LABORAL:\n${expBlocks.join('\n---\n')}`);
+    } else if (typeof cvData.experiencia === 'string' && cvData.experiencia.trim()) {
+      sections.push(`EXPERIENCIA LABORAL:\n${cvData.experiencia}`);
+    }
+  }
+  if (cvData.habilidadesTec) {
+    const arr = Array.isArray(cvData.habilidadesTec) ? cvData.habilidadesTec : [cvData.habilidadesTec];
+    if (arr.length && arr.some(Boolean)) sections.push(`HABILIDADES TÉCNICAS:\n${arr.join(', ')}`);
+  }
+  
+  if (cvData.formacion) {
+    if (Array.isArray(cvData.formacion) && cvData.formacion.length > 0) {
+      const formBlocks = cvData.formacion.map(form => {
+        const parts = [];
+        if (form.titulo) parts.push(`Título: ${form.titulo}`);
+        if (form.institucion) parts.push(`Institución: ${form.institucion}`);
+        const start = form.fechaInicio || '';
+        const end = form.actualidad ? 'Actualidad' : (form.fechaFin || '');
+        if (start || end) parts.push(`Período: ${[start, end].filter(Boolean).join(' – ')}`);
+        return parts.join('\n');
+      });
+      sections.push(`FORMACIÓN ACADÉMICA:\n${formBlocks.join('\n---\n')}`);
+    } else if (typeof cvData.formacion === 'string' && cvData.formacion.trim()) {
+      sections.push(`FORMACIÓN ACADÉMICA:\n${cvData.formacion}`);
+    }
+  }
+  
+  if (cvData.habilidadesBlandas) {
+    const arr = Array.isArray(cvData.habilidadesBlandas) ? cvData.habilidadesBlandas : [cvData.habilidadesBlandas];
+    if (arr.length && arr.some(Boolean)) sections.push(`HABILIDADES BLANDAS:\n${arr.join(', ')}`);
+  }
+  
+  if (cvData.idiomas) {
+    let idStr = '';
+    if (Array.isArray(cvData.idiomas) && cvData.idiomas.length > 0) {
+      idStr = cvData.idiomas.map(i => `${i.nombre} (${i.nivel})`).join(', ');
+    } else if (typeof cvData.idiomas === 'string' && cvData.idiomas.trim()) {
+      idStr = cvData.idiomas;
+    }
+    if (idStr) sections.push(`IDIOMAS: ${idStr}`);
+  }
 
   return sections.join('\n\n');
 }
