@@ -921,11 +921,17 @@ async function executeDownloadCV() {
     iframeDoc.write(htmlContent);
     iframeDoc.close();
     
+    const originalTitle = document.title;
+    const nombreStr = (cv.nombre || '').replace(/\s+/g, '');
+    const rolStr = (cv.rol || '').replace(/\s+/g, '');
+    document.title = `CV-${nombreStr}-${rolStr}`;
+
     iframe.contentWindow.focus();
     setTimeout(() => {
         iframe.contentWindow.print();
         setTimeout(() => {
             document.body.removeChild(iframe);
+            document.title = originalTitle;
         }, 1000);
     }, 250);
 

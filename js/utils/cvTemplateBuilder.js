@@ -210,7 +210,7 @@ export function buildATSCurriculumHTML(cvData) {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>CV - ${escapeHtml(nombre)}</title>
+    <title>CV-${escapeHtml(nombre.replace(/\s+/g, ''))}-${escapeHtml(rol.replace(/\s+/g, ''))}</title>
     <style>
         /* Reglas de diseño ATS */
         :root {
