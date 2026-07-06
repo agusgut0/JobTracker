@@ -89,6 +89,36 @@ export function buildATSCurriculumHTML(cvData) {
         }
     }
 
+    // PROYECTOS ACADÉMICOS
+    if (cvData.proyectos && Array.isArray(cvData.proyectos) && cvData.proyectos.length > 0) {
+        let proyHtml = '';
+        cvData.proyectos.forEach(proy => {
+            const nombre = escapeHtml(proy.nombre);
+            
+            proyHtml += `
+                <div class="exp-item">
+                    <div class="exp-header">
+                        <strong>${nombre}</strong>
+                    </div>
+                    <div class="exp-desc">
+                        ${proy.descripcion}
+                    </div>
+                </div>
+            `;
+        });
+
+        if (proyHtml) {
+            contentHtml += `
+                <section>
+                    <h2>PROYECTOS ACADÉMICOS</h2>
+                    <div class="section-content">
+                        ${proyHtml}
+                    </div>
+                </section>
+            `;
+        }
+    }
+
     // HABILIDADES TÉCNICAS
     if (cvData.habilidadesTec && Array.isArray(cvData.habilidadesTec) && cvData.habilidadesTec.length > 0) {
         const habTec = cvData.habilidadesTec.map(escapeHtml).join(' &middot; ');

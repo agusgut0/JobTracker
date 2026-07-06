@@ -60,6 +60,24 @@ function formatCVForPrompt(cvData) {
       sections.push(`EXPERIENCIA LABORAL:\n${cvData.experiencia}`);
     }
   }
+
+  if (cvData.proyectos) {
+    if (Array.isArray(cvData.proyectos) && cvData.proyectos.length > 0) {
+      const proyBlocks = cvData.proyectos.map(proy => {
+        const parts = [];
+        if (proy.nombre) parts.push(`Proyecto: ${proy.nombre}`);
+        if (proy.descripcion) {
+          const plain = proy.descripcion.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+          if (plain) parts.push(`Descripción: ${plain}`);
+        }
+        return parts.join('\n');
+      });
+      sections.push(`PROYECTOS ACADÉMICOS:\n${proyBlocks.join('\n---\n')}`);
+    } else if (typeof cvData.proyectos === 'string' && cvData.proyectos.trim()) {
+      sections.push(`PROYECTOS ACADÉMICOS:\n${cvData.proyectos}`);
+    }
+  }
+
   if (cvData.habilidadesTec) {
     const arr = Array.isArray(cvData.habilidadesTec) ? cvData.habilidadesTec : [cvData.habilidadesTec];
     if (arr.length && arr.some(Boolean)) sections.push(`HABILIDADES TÉCNICAS:\n${arr.join(', ')}`);
@@ -186,6 +204,12 @@ El JSON debe respetar estrictamente la siguiente estructura de tipos y campos:
       "fechaFin": "[Fecha en formato YYYY-MM o vacío si es actualidad]",
       "actualidad": [true o false según corresponda],
       "descripcion": "[Generá una lista HTML con etiquetas <ul><li>...</li></ul> que contenga entre 3 y 5 bullets de impacto técnico reescritos. Usá verbos de acción fuertes en primera persona del pasado. Resaltá las tecnologías clave usando la etiqueta <strong>. Si aplica, mencioná cómo la tecnología base del candidato se relaciona con la requerida]"
+    }
+  ],
+  "proyectos": [
+    {
+      "nombre": "[Nombre del proyecto adaptado formalmente]",
+      "descripcion": "[Descripción del proyecto optimizada para las palabras clave de la oferta]"
     }
   ],
   "habilidadesTec": [

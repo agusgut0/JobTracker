@@ -36,6 +36,9 @@ function cacheDOM() {
   el.expContainer        = document.getElementById('cvExperienciaContainer');
   el.btnAddExp           = document.getElementById('btnAddExp');
   
+  el.proyectosContainer  = document.getElementById('cvProyectosContainer');
+  el.btnAddProyecto      = document.getElementById('btnAddProyecto');
+  
   el.pillsHabTec         = document.getElementById('pillsHabTec');
   el.inputHabTec         = document.getElementById('inputHabTec');
   el.btnAddHabTec        = document.getElementById('btnAddHabTec');
@@ -70,6 +73,7 @@ function collectCVData() {
   });
   // Collect structured and dynamic data
   data.experiencia = collectExperiencias();
+  data.proyectos = collectProyectos();
   data.formacion = collectFormaciones();
   data.habilidadesTec = collectPills(el.pillsHabTec);
   data.habilidadesBlandas = collectPills(el.pillsHabBlandas);
@@ -83,6 +87,7 @@ function clearCVForm() {
   });
   // Clear dynamic fields
   renderExperiencias([]);
+  renderProyectos([]);
   renderFormaciones([]);
   renderPills(el.pillsHabTec, []);
   renderPills(el.pillsHabBlandas, []);
@@ -96,6 +101,9 @@ function setCVData(cvData) {
   // Render dynamic fields
   const exp = cvData.experiencia;
   renderExperiencias(Array.isArray(exp) ? exp : []);
+  
+  const proy = cvData.proyectos;
+  renderProyectos(Array.isArray(proy) ? proy : []);
   
   const form = cvData.formacion;
   renderFormaciones(Array.isArray(form) ? form : []);
@@ -408,6 +416,124 @@ function collectExperiencias() {
       fechaInicio: r.fechaInicio.value,
       fechaFin:    r.fechaFin.value,
       actualidad:  r.actualidad.checked,
+      descripcion: r.descripcion.innerHTML.trim(),
+    };
+  }).filter(Boolean);
+}
+
+// ── Proyectos Académicos — Sub-form System ───────────────────────────────────
+
+function defaultProyecto() {
+  return { nombre: '', descripcion: '' };
+}
+
+function renderProyectos(proyectosArray) {
+  if (!el.proyectosContainer) return;
+  el.proyectosContainer.innerHTML = '';
+  proyectosArray.forEach((proy, i) => {
+    el.proyectosContainer.appendChild(createProyectoCard(proy, i, proyectosArray.length));
+  });
+}
+
+function buildProyectoLabel(proy, index) {
+  if (proy.nombre) return proy.nombre;
+  return `Proyecto ${index + 1}`;
+}
+
+function createProyectoCard(proy, index, total) {
+  const card = document.createElement('div');
+  card.className = 'exp-card';
+  card.dataset.index = index;
+
+  const header = document.createElement('div');
+  header.className = 'exp-card-header';
+
+  const headerLeft = document.createElement('div');
+  headerLeft.className = 'exp-card-header-left';
+
+  const toggle = document.createElement('span');
+  toggle.className = 'exp-card-toggle';
+  toggle.textContent = '▼';
+
+  const label = document.createElement('span');
+  label.className = 'exp-card-label';
+  label.textContent = buildProyectoLabel(proy, index);
+
+  headerLeft.appendChild(toggle);
+  headerLeft.appendChild(label);
+
+  const btnDel = document.createElement('button');
+  btnDel.type = 'button';
+  btnDel.className = 'btn-exp-delete';
+  btnDel.title = 'Eliminar proyecto';
+  btnDel.textContent = '✕';
+  btnDel.addEventListener('click', (e) => {
+    e.stopPropagation();
+    card.style.animation = 'none';
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(-8px)';
+    card.style.transition = 'all .2s ease';
+    setTimeout(() => card.remove(), 200);
+  });
+
+  header.appendChild(headerLeft);
+  header.appendChild(btnDel);
+
+  header.addEventListener('click', () => {
+    card.classList.toggle('collapsed');
+  });
+
+  const body = document.createElement('div');
+  body.className = 'exp-card-body';
+  const fieldsGrid = document.createElement('div');
+  fieldsGrid.className = 'exp-fields';
+
+  const nombreField = createField('Nombre del proyecto', 'text', proy.nombre, 'Ej: Sistema de Gestión Escolar');
+  fieldsGrid.appendChild(nombreField.wrapper);
+
+  const descField = document.createElement('div');
+  descField.className = 'exp-field full';
+  const descLabel = document.createElement('label');
+  descLabel.textContent = 'Descripción del proyecto';
+  descField.appendChild(descLabel);
+
+  const { wrapper: richWrapper, editor: richEditor } = createRichEditor(
+    proy.descripcion,
+    'Describí tu rol, tecnologías usadas y resultados del proyecto...'
+  );
+  descField.appendChild(richWrapper);
+  fieldsGrid.appendChild(descField);
+
+  body.appendChild(fieldsGrid);
+
+  card.appendChild(header);
+  card.appendChild(body);
+
+  function updateCardHeader() {
+    const currentProy = {
+      nombre: nombreField.input.value,
+    };
+    label.textContent = buildProyectoLabel(currentProy, index);
+  }
+
+  nombreField.input.addEventListener('input', updateCardHeader);
+
+  card._refs = {
+    nombre: nombreField.input,
+    descripcion: richEditor,
+  };
+
+  return card;
+}
+
+function collectProyectos() {
+  if (!el.proyectosContainer) return [];
+  const cards = el.proyectosContainer.querySelectorAll('.exp-card');
+  return Array.from(cards).map(card => {
+    const r = card._refs;
+    if (!r) return null;
+    return {
+      nombre:      r.nombre.value.trim(),
       descripcion: r.descripcion.innerHTML.trim(),
     };
   }).filter(Boolean);
@@ -744,6 +870,14 @@ function handleAddExperience() {
   newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
+function handleAddProyecto() {
+  if (!el.proyectosContainer) return;
+  const currentCards = el.proyectosContainer.querySelectorAll('.exp-card');
+  const newCard = createProyectoCard(defaultProyecto(), currentCards.length, currentCards.length + 1);
+  el.proyectosContainer.appendChild(newCard);
+  newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
 /** Genera y descarga el CV en PDF (ATS-optimized) usando el diálogo de impresión. */
 async function handleDownloadCV() {
   const cv = getCVData();
@@ -845,6 +979,7 @@ export function init() {
   if (el.btnCopyCV) el.btnCopyCV.addEventListener('click', handleCopyCV);
   if (el.btnPasteCV) el.btnPasteCV.addEventListener('click', handlePasteCV);
   if (el.btnAddExp) el.btnAddExp.addEventListener('click', handleAddExperience);
+  if (el.btnAddProyecto) el.btnAddProyecto.addEventListener('click', handleAddProyecto);
 
   // Pills handlers
   if (el.btnAddHabTec) {
