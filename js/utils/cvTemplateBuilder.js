@@ -20,10 +20,27 @@ export function buildATSCurriculumHTML(cvData) {
     const rol = cvData.rol || 'Puesto / Rol';
     
     const contactInfo = [];
-    if (cvData.email) contactInfo.push(escapeHtml(cvData.email));
-    if (cvData.telefono) contactInfo.push(escapeHtml(cvData.telefono));
-    if (cvData.linkedin) contactInfo.push(escapeHtml(cvData.linkedin));
-    if (cvData.portfolio) contactInfo.push(escapeHtml(cvData.portfolio));
+    if (cvData.email) {
+        const email = escapeHtml(cvData.email);
+        contactInfo.push(`<a href="mailto:${email}" style="color: var(--color-principal); text-decoration: none;">${email}</a>`);
+    }
+    if (cvData.telefono) {
+        contactInfo.push(escapeHtml(cvData.telefono));
+    }
+    if (cvData.linkedin) {
+        const linkedinRaw = cvData.linkedin.trim();
+        const linkedinStr = escapeHtml(linkedinRaw);
+        const displayStr = escapeHtml(linkedinRaw.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, ''));
+        const href = linkedinRaw.startsWith('http') ? linkedinStr : `https://${linkedinStr}`;
+        contactInfo.push(`<a href="${href}" target="_blank" style="color: var(--color-principal); text-decoration: none;">${displayStr}</a>`);
+    }
+    if (cvData.portfolio) {
+        const portfolioRaw = cvData.portfolio.trim();
+        const portfolioStr = escapeHtml(portfolioRaw);
+        const displayStr = escapeHtml(portfolioRaw.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, ''));
+        const href = portfolioRaw.startsWith('http') ? portfolioStr : `https://${portfolioStr}`;
+        contactInfo.push(`<a href="${href}" target="_blank" style="color: var(--color-principal); text-decoration: none;">${displayStr}</a>`);
+    }
     
     const contactString = contactInfo.join(' | ');
 
