@@ -430,7 +430,7 @@ function collectExperiencias() {
   }).filter(Boolean);
 }
 
-// ── Proyectos Académicos — Sub-form System ───────────────────────────────────
+// ── Proyectos — Sub-form System ───────────────────────────────────
 
 function defaultProyecto() {
   return { nombre: '', descripcion: '' };

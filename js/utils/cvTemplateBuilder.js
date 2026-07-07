@@ -106,7 +106,7 @@ export function buildATSCurriculumHTML(cvData) {
         }
     }
 
-    // PROYECTOS ACADÉMICOS
+    // PROYECTOS
     if (cvData.proyectos && Array.isArray(cvData.proyectos) && cvData.proyectos.length > 0) {
         let proyHtml = '';
         cvData.proyectos.forEach(proy => {
@@ -127,7 +127,7 @@ export function buildATSCurriculumHTML(cvData) {
         if (proyHtml) {
             contentHtml += `
                 <section>
-                    <h2>PROYECTOS ACADÉMICOS</h2>
+                    <h2>PROYECTOS</h2>
                     <div class="section-content">
                         ${proyHtml}
                     </div>

@@ -72,9 +72,9 @@ function formatCVForPrompt(cvData) {
         }
         return parts.join('\n');
       });
-      sections.push(`PROYECTOS ACADÉMICOS:\n${proyBlocks.join('\n---\n')}`);
+      sections.push(`PROYECTOS:\n${proyBlocks.join('\n---\n')}`);
     } else if (typeof cvData.proyectos === 'string' && cvData.proyectos.trim()) {
-      sections.push(`PROYECTOS ACADÉMICOS:\n${cvData.proyectos}`);
+      sections.push(`PROYECTOS:\n${cvData.proyectos}`);
     }
   }
 
