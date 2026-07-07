@@ -9,6 +9,7 @@ import { openDB } from 'https://cdn.jsdelivr.net/npm/idb@8/+esm';
 const STORAGE_KEY_JOBS  = 'jobtracker_applications';
 const STORAGE_KEY_CV    = 'jobtracker_cv';
 const STORAGE_KEY_ROLES = 'jt_roles';
+const STORAGE_KEY_COUNTRY = 'jt_search_country';
 
 const MAX_CV_SLOTS = 20;
 
@@ -33,6 +34,7 @@ let jobs          = [];
 let cvSlots       = new Array(MAX_CV_SLOTS).fill(null);
 let activeCVIndex = 0;
 let userRoles     = [];
+let searchCountry = 'ar';
 
 // ── Persistencia (Privadas) ──────────────────────────────────────────────────
 
@@ -219,6 +221,12 @@ export function load() {
     const savedRoles = localStorage.getItem(STORAGE_KEY_ROLES);
     if (savedRoles) userRoles = JSON.parse(savedRoles);
   } catch { userRoles = []; }
+
+  // País de búsqueda
+  try {
+    const savedCountry = localStorage.getItem(STORAGE_KEY_COUNTRY);
+    if (savedCountry) searchCountry = savedCountry;
+  } catch { searchCountry = 'ar'; }
 }
 
 // ── Getters Puros ────────────────────────────────────────────────────────────
@@ -384,6 +392,25 @@ export function deleteRole(id) {
   userRoles = userRoles.filter(r => r.id !== id);
   if (userRoles.length !== before) { persistRoles(); return true; }
   return false;
+}
+
+/**
+ * @function getSearchCountry
+ * @description Obtiene el código del país seleccionado para las búsquedas.
+ * @returns {string}
+ */
+export function getSearchCountry() {
+  return searchCountry;
+}
+
+/**
+ * @function setSearchCountry
+ * @description Guarda el código de país seleccionado y lo persiste.
+ * @param {string} code Código de país (ar, mx, co, etc.)
+ */
+export function setSearchCountry(code) {
+  searchCountry = code;
+  localStorage.setItem(STORAGE_KEY_COUNTRY, code);
 }
 
 // ── Import/Export ────────────────────────────────────────────────────────────

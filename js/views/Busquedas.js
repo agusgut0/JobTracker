@@ -4,7 +4,7 @@
  */
 
 import { PLATFORMS } from '../utils/search.js';
-import { getRoles, addRole, deleteRole } from '../utils/storage.js';
+import { getRoles, addRole, deleteRole, getSearchCountry, setSearchCountry } from '../utils/storage.js';
 import { showToast } from '../components/Toast.js';
 
 // ── Estado Local ─────────────────────────────────────────────────────────────
@@ -18,6 +18,7 @@ function cacheDOM() {
   el.roleInput = document.getElementById('roleInput');
   el.btnAddRole = document.getElementById('btnAddRole');
   el.groupB = document.getElementById('groupB');
+  el.countrySelect = document.getElementById('countrySelect');
 }
 
 /** Escapa strings para HTML */
@@ -60,9 +61,16 @@ function renderSearchButtons() {
   const activeRole = roles.find(r => r.id === activeRoleId);
   const query = activeRole ? activeRole.label : null;
   const qVal = (query || '').trim();
+  const country = getSearchCountry();
 
-  el.groupB.innerHTML = PLATFORMS.map(p => {
-    const url = p.url(qVal);
+  if (el.countrySelect) {
+    el.countrySelect.value = country;
+  }
+
+  const filteredPlatforms = PLATFORMS.filter(p => !p.countries || p.countries.includes(country));
+
+  el.groupB.innerHTML = filteredPlatforms.map(p => {
+    const url = p.url(qVal, country);
     const subText = qVal ? `Buscar: ${esc(qVal)}` : 'Ver plataforma';
     return `<a class="search-btn" href="${url}" target="_blank" rel="noopener noreferrer">
       <span class="ico">${p.ico}</span>
@@ -139,6 +147,14 @@ export function init() {
         e.preventDefault();
         handleAddRole();
       }
+    });
+  }
+
+  if (el.countrySelect) {
+    el.countrySelect.addEventListener('change', e => {
+      setSearchCountry(e.target.value);
+      renderSearchButtons();
+      showToast('Filtro de país actualizado.');
     });
   }
 

@@ -1598,6 +1598,50 @@ textarea { resize: vertical; min-height: 72px; }
   .form-group.full   { grid-column: 1; }
 }
 
+/* ── COUNTRY SELECTOR ────────────────────────────────────────── */
+.search-header-row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1.5px solid var(--border);
+  padding-bottom: 12px;
+}
+
+.country-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.country-selector-container label {
+  font-size: .75rem;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.country-select {
+  width: auto;
+  min-width: 130px;
+  height: 28px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: .75rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--transition);
+}
+
+.country-select:focus {
+  border-color: var(--accent);
+}
+
 @media (max-width: 480px) {
   .sidebar {
     width: 60px;
