@@ -37,7 +37,7 @@ Analizá ambas fuentes y devolvé la información estructurada bajo el siguiente
 
 ### 2. Resumen Profesional Optimizado (Máx. 4 líneas)
 TITULO: [Escribi el rol técnico del puesto solicitante haciendolo concordar con la experiencia del usuario]
-[Escribí un párrafo compacto que responda: Qué es (Rol técnico) + Cuánta experiencia/Seniority tiene + Stack principal relevante para la oferta + Mayor valor que aporta para resolver el problema de la empresa].
+[Escribí un párrafo compacto basado estrictamente en el resumen del CV original. Mantené la esencia, tono y enfoque del candidato, evitando ser complaciente o sobre-adaptarlo a la oferta. Integrá requisitos técnicos de la oferta en este bloque solo si es absolutamente necesario y fluye de forma natural; el peso de la adaptación técnica debe recaer en las secciones de Experiencia, Proyectos y Habilidades Técnicas].
 
 ### 3. Core Skills Reordenadas
 * **Technical Skills (Relevantes para el puesto):** [Tecnologías ordenadas de Mayor a Menor importancia según la oferta].

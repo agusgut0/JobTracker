@@ -195,7 +195,7 @@ El JSON debe respetar estrictamente la siguiente estructura de tipos y campos:
   "telefono": "[Teléfono del candidato]",
   "linkedin": "[Enlace o usuario de LinkedIn]",
   "portfolio": "[Enlace a GitHub o Portfolio si aplica, sino string vacío]",
-  "resumen": "[Escribí un párrafo compacto de máx 4 líneas que responda: Qué es + Cuánta experiencia tiene + Stack principal relevante + Capacidad de trasladar su conocimiento a las tecnologías equivalentes requeridas por la oferta (ej: 'con sólida base en MySQL y capacidad de adaptación inmediata a entornos SQLite')]",
+  "resumen": "[Escribí un párrafo compacto de máx 4 líneas basado estrictamente en el resumen del CV original. Mantené la esencia, tono y enfoque del candidato, evitando ser complaciente o sobre-adaptarlo a la oferta. Integrá requisitos técnicos de la oferta en este bloque solo si es absolutamente necesario y fluye de forma natural; el peso de la adaptación técnica debe recaer en las secciones de Experiencia, Proyectos y Habilidades Técnicas.]",
   "experiencia": [
     {
       "rol": "[Puesto o Cargo adaptado formalmente]",
