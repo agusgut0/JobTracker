@@ -15,3 +15,7 @@ Puedes probar la aplicación en producción de forma inmediata aquí:
 
 *(Nota: Al ser una aplicación 100% client-side, tus datos se guardan de forma segura y privada en el localStorage de tu propio navegador).*
 
+## Docker
+
+docker build -t jobtracker .
+docker run -d -p 8080:80 jobtracker
