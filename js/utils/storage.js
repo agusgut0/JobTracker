@@ -93,65 +93,6 @@ export async function deleteProfilePic() {
   await db.delete(STORE_NAME, PIC_KEY);
 }
 
-// ── Migración Legacy ─────────────────────────────────────────────────────────
-
-/**
- * @function migrateExperiencia
- * @description Convierte experiencia legacy (string) al formato nuevo (array de objetos).
- * @param {string} text Texto plano de experiencia.
- * @returns {Array} Array de objetos de experiencia.
- */
-function migrateExperiencia(text) {
-  if (!text || !text.trim()) return [];
-  return [{
-    lugar: '',
-    rol: '',
-    fechaInicio: '',
-    fechaFin: '',
-    actualidad: false,
-    descripcion: text.trim(),
-  }];
-}
-
-/**
- * @function migrateFormacion
- * @description Convierte formacion legacy (string) al formato nuevo (array de objetos).
- */
-function migrateFormacion(text) {
-  if (!text || !text.trim()) return [];
-  return [{
-    institucion: '',
-    titulo: text.trim(),
-    fechaInicio: '',
-    fechaFin: '',
-    actualidad: false
-  }];
-}
-
-/**
- * @function migrateStringToArray
- * @description Convierte texto plano (separado por comas/saltos/barras) en array.
- */
-function migrateStringToArray(text) {
-  if (!text || typeof text !== 'string') return Array.isArray(text) ? text : [];
-  return text.split(/[\n|,]+/).map(s => s.trim()).filter(Boolean);
-}
-
-/**
- * @function migrateIdiomas
- * @description Convierte idiomas string a array de objetos {nombre, nivel}.
- */
-function migrateIdiomas(text) {
-  if (!text || typeof text !== 'string') return Array.isArray(text) ? text : [];
-  const items = text.split(/[\n|,]+/).map(s => s.trim()).filter(Boolean);
-  return items.map(item => {
-    const match = item.match(/(.+?)\s*\(?([A-C][1-2]|Nativo)\)?$/i);
-    if (match) {
-      return { nombre: match[1].trim(), nivel: match[2].trim() };
-    }
-    return { nombre: item, nivel: 'A confirmar' };
-  });
-}
 
 // ── Inicialización ───────────────────────────────────────────────────────────
 
@@ -180,10 +121,6 @@ export function load() {
           && parsed.activeIndex >= 0
           && parsed.activeIndex < MAX_CV_SLOTS)
           ? parsed.activeIndex : 0;
-      } else if (typeof parsed === 'string') {
-        cvSlots = new Array(MAX_CV_SLOTS).fill(null);
-        cvSlots[0] = { ...CV_DEFAULT, experiencia: migrateExperiencia(parsed) };
-        activeCVIndex = 0;
       } else if (typeof parsed === 'object' && !Array.isArray(parsed)) {
         cvSlots = new Array(MAX_CV_SLOTS).fill(null);
         cvSlots[0] = { ...CV_DEFAULT, ...parsed };
@@ -195,24 +132,14 @@ export function load() {
     activeCVIndex = 0;
   }
 
-  // Migrar datos legacy (string → array) en todos los slots
+  // Sanitizar campos: asegurar que los campos de array sean arrays
   for (let i = 0; i < cvSlots.length; i++) {
     if (cvSlots[i]) {
-      if (typeof cvSlots[i].experiencia === 'string') {
-        cvSlots[i].experiencia = migrateExperiencia(cvSlots[i].experiencia);
-      }
-      if (typeof cvSlots[i].formacion === 'string') {
-        cvSlots[i].formacion = migrateFormacion(cvSlots[i].formacion);
-      }
-      if (typeof cvSlots[i].habilidadesTec === 'string') {
-        cvSlots[i].habilidadesTec = migrateStringToArray(cvSlots[i].habilidadesTec);
-      }
-      if (typeof cvSlots[i].habilidadesBlandas === 'string') {
-        cvSlots[i].habilidadesBlandas = migrateStringToArray(cvSlots[i].habilidadesBlandas);
-      }
-      if (typeof cvSlots[i].idiomas === 'string') {
-        cvSlots[i].idiomas = migrateIdiomas(cvSlots[i].idiomas);
-      }
+      if (!Array.isArray(cvSlots[i].experiencia))       cvSlots[i].experiencia = [];
+      if (!Array.isArray(cvSlots[i].formacion))          cvSlots[i].formacion = [];
+      if (!Array.isArray(cvSlots[i].habilidadesTec))     cvSlots[i].habilidadesTec = [];
+      if (!Array.isArray(cvSlots[i].habilidadesBlandas)) cvSlots[i].habilidadesBlandas = [];
+      if (!Array.isArray(cvSlots[i].idiomas))            cvSlots[i].idiomas = [];
     }
   }
 
@@ -492,32 +419,16 @@ export function importJSON(file) {
           activeCVIndex = 0;
           persistCV();
           hasCV = true;
-        } else if (typeof parsed.cvMain === 'string') {
-          cvSlots = new Array(MAX_CV_SLOTS).fill(null);
-          cvSlots[0] = { ...CV_DEFAULT, experiencia: parsed.cvMain };
-          activeCVIndex = 0;
-          persistCV();
-          hasCV = true;
         }
 
-        // Apply migrations to imported slots
+        // Sanitizar campos: asegurar que los campos de array sean arrays
         for (let i = 0; i < cvSlots.length; i++) {
           if (cvSlots[i]) {
-            if (typeof cvSlots[i].experiencia === 'string') {
-              cvSlots[i].experiencia = migrateExperiencia(cvSlots[i].experiencia);
-            }
-            if (typeof cvSlots[i].formacion === 'string') {
-              cvSlots[i].formacion = migrateFormacion(cvSlots[i].formacion);
-            }
-            if (typeof cvSlots[i].habilidadesTec === 'string') {
-              cvSlots[i].habilidadesTec = migrateStringToArray(cvSlots[i].habilidadesTec);
-            }
-            if (typeof cvSlots[i].habilidadesBlandas === 'string') {
-              cvSlots[i].habilidadesBlandas = migrateStringToArray(cvSlots[i].habilidadesBlandas);
-            }
-            if (typeof cvSlots[i].idiomas === 'string') {
-              cvSlots[i].idiomas = migrateIdiomas(cvSlots[i].idiomas);
-            }
+            if (!Array.isArray(cvSlots[i].experiencia))       cvSlots[i].experiencia = [];
+            if (!Array.isArray(cvSlots[i].formacion))          cvSlots[i].formacion = [];
+            if (!Array.isArray(cvSlots[i].habilidadesTec))     cvSlots[i].habilidadesTec = [];
+            if (!Array.isArray(cvSlots[i].habilidadesBlandas)) cvSlots[i].habilidadesBlandas = [];
+            if (!Array.isArray(cvSlots[i].idiomas))            cvSlots[i].idiomas = [];
           }
         }
 
