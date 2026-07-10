@@ -49,11 +49,8 @@ async function bootstrap() {
   });
 
   Sidebar.bindExport(() => {
-    const count = exportJSON();
-    const msg = count > 0
-      ? `📥 ${count} oferta(s) exportadas correctamente.`
-      : '📥 JSON descargado (sin ofertas aún, pero los CVs están guardados).';
-    showToast(msg);
+    exportJSON();
+    showToast('📥 JSON exportado correctamente.');
   });
 
   Sidebar.bindImport(async (file) => {
