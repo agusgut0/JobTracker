@@ -167,65 +167,101 @@ export function promptAdaptarCV(job, cvData) {
   const candidateName = cvData.nombre || 'Candidato';
   const cvBlock = formatCVForPrompt(cvData);
 
-  return `Actuá como un experto en Redacción de CVs de Alto Impacto para el sector IT y especialista en optimización de algoritmos ATS (Applicant Tracking Systems). 
+  return `<rol>
+Actuás como un Consultor Senior de Career Coaching y Especialista en Optimización de CVs para sistemas ATS (Applicant Tracking Systems), con más de 15 años de experiencia en reclutamiento técnico (IT/Software). Tu escritura combina precisión técnica con redacción ejecutiva persuasiva, sin caer en exageraciones ni en lenguaje corporativo vacío.
+</rol>
 
-Tu objetivo es adaptar de forma estratégica el CV del candidato para la oferta laboral provista, maximizando el "Keyword Match" mediante la homologación de tecnologías equivalentes, sin caer en prácticas de spam y manteniendo la estricta autenticidad del perfil.
+<contexto>
+Vas a recibir dos documentos:
+1. CV_ORIGINAL: el currículum actual del candidato.
+2. OFERTA_LABORAL: la descripción del puesto al que se postula.
 
-=== REGLAS ESTRICTAS DE NEGOCIO ===
-1. PROHIBIDO INVENTAR: No agregues tecnologías, herramientas o roles que el candidato no domine en absoluto. Sin embargo, SI la oferta pide una tecnología que el candidato no tiene, pero el candidato posee una EQUIVALENTE directa (ej. pide SQLite y tiene MySQL, pide Vue y tiene React), debés aplicar la REGLA DE HOMOLOGACIÓN (ver Regla 4).
-2. LIMITACIÓN DE MÉTRICAS: Si el CV original no tiene métricas numéricas, no las inventes. En su lugar, usá la estructura de impacto: "Acción (Verbo) + Contexto Técnico + Resultado/Propósito" (Método XYZ de Google).
-3. TONO: Profesional, técnico, directo y orientado al logro. Evitá adjetivos vacíos como "motivado", "proactivo" o "apasionado".
-4. REGLA DE HOMOLOGACIÓN PARA ATS: Para no perder palabras clave críticas de la oferta, agrupá las tecnologías por conceptos generales. Si la oferta pide un motor o framework específico que el candidato no tiene pero maneja su equivalente conceptual, reflejá esa equivalencia aclarando el nivel (ej: "Bases de Datos Relacionales: MySQL / SQLite [nociones]" o "Frameworks Frontend: React (Avanzado) / Vue [adaptabilidad]").
+Tu tarea es generar una versión adaptada del CV, optimizada específicamente para esta oferta, conservando el 100% de veracidad de la información original. No es un CV nuevo: es el mismo candidato, mejor posicionado para este puesto puntual.
+</contexto>
 
-=== CV ORIGINAL (${candidateName}) ===
-${cvBlock}
+<objetivo>
+Producir un único objeto JSON con el CV adaptado, siguiendo ESTRICTAMENTE el esquema definido en <formato_salida>, aplicando todas las reglas de <reglas_fundamentales>.
+</objetivo>
 
-=== OFERTA LABORAL ===
-${ofertaBlock(job)}
+<reglas_fundamentales>
 
-=== INSTRUCCIONES DE FORMATO Y SALIDA ===
-Analizá ambas fuentes y devolvé la información adaptada **ÚNICA Y EXCLUSIVAMENTE** en un bloque de código JSON válido, sin textos introductorios ni explicaciones posteriores. 
+**Regla 1 — Honestidad radical (no inventar):**
+Nunca agregues tecnologías, herramientas, empresas, títulos o logros que no figuren, de forma explícita o razonablemente inferible, en el CV_ORIGINAL. Adaptar no es inventar: es reordenar, priorizar y reformular con vocabulario más preciso.
 
-El JSON debe respetar estrictamente la siguiente estructura de tipos y campos:
+**Regla 2 — Separación experiencia real vs. proyectos:**
+Nunca mezcles responsabilidades de un empleo formal con resultados obtenidos en proyectos personales, académicos o freelance. Si en el "resumen" es relevante mencionar experiencia de proyectos, aclaralo de forma explícita (ej: "Trabajé en proyectos que involucraban...") para no generar ambigüedad sobre la seniority real del candidato.
 
+**Regla 3 — Voz y tono del candidato:**
+Mantené el tono real del candidato: ni sumiso ni sobrevendido. Redactá siempre en primera persona del pasado ("Desarrollé", "Implementé", "Lideré"), con vocabulario ejecutivo pero natural, evitando adjetivos vacíos ("apasionado", "proactivo por naturaleza", etc.) salvo que estén sostenidos por evidencia concreta en el texto original.
+
+**Regla 4 — Mapeo conceptual de tecnologías equivalentes:**
+Cuando una tecnología del CV_ORIGINAL sea funcionalmente equivalente a una requerida en la OFERTA_LABORAL pero no idéntica, no afirmes que el candidato usó la tecnología exacta que pide la oferta. En su lugar, usá un formato conceptual que agrupe ambas bajo una categoría funcional común, legible tanto por un reclutador humano como por un parser ATS.
+Formato: "[Categoría funcional] ([tecnología real del candidato], [tecnología de la oferta, solo si aplica])"
+Ejemplos:
+- Candidato usó MySQL, oferta pide PostgreSQL → "Motores Relacionales (MySQL, PostgreSQL)"
+- Candidato usó GitHub Actions, oferta pide Jenkins → "CI/CD (GitHub Actions)"
+Esta regla se aplica principalmente en "habilidadesTec", pero puede extenderse a "descripcion" si aporta claridad sin sonar forzado.
+
+**Regla 5 — Cuantificación de impacto:**
+Siempre que el CV_ORIGINAL lo permita (aunque sea de forma indirecta), agregá métricas de impacto (%, tiempo ahorrado, volumen de datos, cantidad de usuarios/equipos, reducción de errores, etc.). Si no hay datos numéricos explícitos, usá métricas de alcance o escala verificables a partir del contexto (ej: "equipo de X personas", "80+ estaciones de trabajo"). Nunca inventes cifras de la nada.
+
+**Regla 6 — Priorización por relevancia:**
+Analizá primero la OFERTA_LABORAL y extraé sus requisitos duros (hard skills), blandos y de seniority. Usá ese análisis para:
+(a) ordenar "habilidadesTec" de mayor a menor relevancia para la oferta,
+(b) ordenar los bullets dentro de cada "descripcion" por impacto/relevancia, eliminando puntos débiles o irrelevantes y fusionando los repetitivos,
+(c) decidir qué proyectos incluir o destacar en "proyectos".
+
+**Regla 7 — Formato de salida estricto:**
+La respuesta final debe ser ÚNICAMENTE el objeto JSON válido, sin explicaciones antes o después, sin bloques de código markdown (sin comillas invertidas triples), sin comentarios. Debe poder parsearse directamente con JSON.parse().
+
+</reglas_fundamentales>
+
+<proceso>
+1. Extraé del CV_ORIGINAL: datos de contacto, resumen, experiencia laboral (diferenciando fechas exactas), proyectos, formación, habilidades técnicas y blandas, e idiomas.
+2. Extraé de la OFERTA_LABORAL: título del puesto, seniority esperado, hard skills (obligatorias vs. deseables), soft skills mencionadas, y palabras clave recurrentes (para optimización ATS).
+3. Cruzá ambos análisis aplicando las <reglas_fundamentales>.
+4. Generá el JSON final siguiendo el esquema exacto de <formato_salida>, sin omitir ni renombrar ninguna clave, y sin agregar claves nuevas.
+</proceso>
+
+<formato_salida>
 {
   "nombre": "[Nombre y Apellido del candidato extraído del CV]",
-  "rol": "[Título del rol técnico del puesto solicitado, haciéndolo concordar con la experiencia del usuario]",
+  "rol": "[Título del rol técnico del puesto solicitado, posicionando de inmediato al candidato para el rol específico haciéndolo concordar con su experiencia real]",
   "email": "[Email del candidato]",
   "telefono": "[Teléfono del candidato]",
   "linkedin": "[Enlace o usuario de LinkedIn]",
   "portfolio": "[Enlace a GitHub o Portfolio si aplica, sino string vacío]",
-  "resumen": "[Escribí un párrafo compacto de máx 4 líneas basado estrictamente en el resumen del CV original. Mantené la esencia, tono y enfoque del candidato, evitando ser complaciente o sobre-adaptarlo a la oferta. Integrá requisitos técnicos de la oferta en este bloque solo si es absolutamente necesario y fluye de forma natural; el peso de la adaptación técnica debe recaer en las secciones de Experiencia, Proyectos y Habilidades Técnicas.]",
+  "resumen": "[Párrafo compacto de máx. 6 líneas, basado estrictamente en el resumen del CV original, sin mezclar experiencia laboral real con experiencia de proyectos (ver Regla 2). Mantené la esencia, tono y enfoque del candidato, evitando ser complaciente o sobre-adaptarlo a la oferta. Integrá requisitos técnicos de la oferta solo si es absolutamente necesario y fluye de forma natural; el peso de la adaptación técnica debe recaer en Experiencia, Proyectos y Habilidades Técnicas.]",
   "experiencia": [
     {
-      "rol": "[Puesto o Cargo adaptado formalmente]",
-      "lugar": "[Empresa u Organización]",
+      "rol": "[Puesto o cargo adaptado formalmente]",
+      "lugar": "[Empresa u organización]",
       "fechaInicio": "[Fecha en formato YYYY-MM o según CV original]",
       "fechaFin": "[Fecha en formato YYYY-MM o vacío si es actualidad]",
-      "actualidad": [true o false según corresponda],
-      "descripcion": "[Generá una lista HTML con etiquetas <ul><li>...</li></ul> que contenga entre 3 y 5 bullets de impacto técnico reescritos. Usá verbos de acción fuertes en primera persona del pasado. Resaltá las tecnologías clave usando la etiqueta <strong>. Si aplica, mencioná cómo la tecnología base del candidato se relaciona con la requerida]"
+      "actualidad": "[true o false según corresponda]",
+      "descripcion": "[Lista HTML <ul><li>...</li></ul> con 3 a 5 bullets de impacto técnico reescritos, aplicando Reglas 3, 5 y 6: verbos de acción fuertes en primera persona del pasado, tecnologías clave resaltadas con <strong>, puntos reordenados por importancia, puntos débiles/irrelevantes eliminados, puntos repetitivos fusionados, impacto cuantificado siempre que sea posible, énfasis en liderazgo/ownership/impacto de negocio. Cada punto debe respaldar esta postulación sin mencionarla directamente.]"
     }
   ],
   "proyectos": [
     {
       "nombre": "[Nombre del proyecto adaptado formalmente]",
-      "descripcion": "[Descripción del proyecto optimizada para las palabras clave de la oferta]"
+      "descripcion": "[Descripción del proyecto optimizada con palabras clave de la oferta, sin perder la idea central del proyecto]"
     }
   ],
   "habilidadesTec": [
-    "[Lista de tecnologías ordenadas de Mayor a Menor importancia según la oferta. Cuando mapees equivalencias, usá el formato conceptual de la Regla 4 (ej: 'Motores Relacionales (MySQL, SQLite)') para pasar los filtros de los ATS sin mentir]"
+    "[Lista de tecnologías ordenadas de mayor a menor importancia según la oferta. Al mapear equivalencias, aplicá el formato conceptual de la Regla 4 para pasar filtros ATS sin faltar a la verdad]"
   ],
   "formacion": [
     {
       "titulo": "[Título académico o certificación]",
-      "institucion": "[Universidad o Academia]",
+      "institucion": "[Universidad o academia]",
       "fechaInicio": "[Fecha de inicio o string vacío]",
       "fechaFin": "[Fecha de fin o string vacío]",
-      "actualidad": [true o false]
+      "actualidad": "[true o false]"
     }
   ],
   "habilidadesBlandas": [
-    "[Máximo 4 competencias interpersonales o metodológicas demostradas implícitamente en la experiencia, sin usar clichés]"
+    "[Máximo 4 competencias interpersonales o metodológicas demostradas implícitamente en la experiencia, sin clichés. Si el puesto requiere alguna específica, se puede agregar cumpliendo el mismo criterio]"
   ],
   "idiomas": [
     {
@@ -233,7 +269,18 @@ El JSON debe respetar estrictamente la siguiente estructura de tipos y campos:
       "nivel": "[Nivel alcanzado según el CV original]"
     }
   ]
-}`;
+}
+</formato_salida>
+
+<instruccion_final>
+A continuación te adjunto el CV_ORIGINAL y la OFERTA_LABORAL de ${candidateName}. Analizalos aplicando el <proceso> y devolveme EXCLUSIVAMENTE el JSON adaptado, cumpliendo cada una de las <reglas_fundamentales>.
+
+CV_ORIGINAL:
+${cvBlock}
+
+OFERTA_LABORAL:
+${ofertaBlock(job)}
+</instruccion_final>`;
 }
 
 // ── Prompt: Crear Carta de Presentación ─────────────────────────────────────
