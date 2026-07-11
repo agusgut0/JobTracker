@@ -212,7 +212,7 @@ Analizá primero la OFERTA_LABORAL y extraé sus requisitos duros (hard skills),
 (c) decidir qué proyectos incluir o destacar en "proyectos".
 
 **Regla 7 — Formato de salida estricto:**
-La respuesta final debe ser ÚNICAMENTE el objeto JSON válido, con indentación de 2 espacios (pretty-printed), sin explicaciones antes o después, sin bloques de código markdown (sin comillas invertidas triples, sin \`\`\`json), sin comentarios. Debe poder parsearse directamente con JSON.parse(). El JSON DEBE estar formateado con saltos de línea e indentación para que sea legible y listo para copiar y pegar.
+La respuesta final debe ser un bloque de código JSON válido, sin textos introductorios ni explicaciones posteriores con indentación de 2 espacios.
 
 </reglas_fundamentales>
 
