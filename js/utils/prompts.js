@@ -212,7 +212,7 @@ Analizá primero la OFERTA_LABORAL y extraé sus requisitos duros (hard skills),
 (c) decidir qué proyectos incluir o destacar en "proyectos".
 
 **Regla 7 — Formato de salida estricto:**
-La respuesta final debe ser ÚNICAMENTE el objeto JSON válido, sin explicaciones antes o después, sin bloques de código markdown (sin comillas invertidas triples), sin comentarios. Debe poder parsearse directamente con JSON.parse().
+La respuesta final debe ser ÚNICAMENTE el objeto JSON válido, con indentación de 2 espacios (pretty-printed), sin explicaciones antes o después, sin bloques de código markdown (sin comillas invertidas triples, sin \`\`\`json), sin comentarios. Debe poder parsearse directamente con JSON.parse(). El JSON DEBE estar formateado con saltos de línea e indentación para que sea legible y listo para copiar y pegar.
 
 </reglas_fundamentales>
 
@@ -273,7 +273,7 @@ La respuesta final debe ser ÚNICAMENTE el objeto JSON válido, sin explicacione
 </formato_salida>
 
 <instruccion_final>
-A continuación te adjunto el CV_ORIGINAL y la OFERTA_LABORAL de ${candidateName}. Analizalos aplicando el <proceso> y devolveme EXCLUSIVAMENTE el JSON adaptado, cumpliendo cada una de las <reglas_fundamentales>.
+A continuación te adjunto el CV_ORIGINAL y la OFERTA_LABORAL de ${candidateName}. Analizalos aplicando el <proceso> y devolveme EXCLUSIVAMENTE el JSON adaptado (con indentación de 2 espacios, legible y formateado con saltos de línea), cumpliendo cada una de las <reglas_fundamentales>.
 
 CV_ORIGINAL:
 ${cvBlock}
