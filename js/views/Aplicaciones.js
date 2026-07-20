@@ -5,7 +5,7 @@
 
 import { getJobs, getStats, addJob, updateJobStatus, deleteJob, getCVData } from '../utils/storage.js';
 import { copyToClipboard } from '../utils/clipboard.js';
-import { promptFIT, promptAdaptarCV, promptCarta } from '../utils/prompts.js';
+import { promptFIT, promptAdaptarCV, promptMailPresentacion, promptMensajePresentacion } from '../utils/prompts.js';
 import { showToast } from '../components/Toast.js';
 
 // ── Variables Globales de Estado UI ──────────────────────────────────────────
@@ -119,9 +119,10 @@ function renderOffers() {
       <div class="ai-section">
         <p class="ai-label">✦ Herramientas IA</p>
         <div class="ai-row">
-          <button class="btn-ai fit   js-ai" data-id="${job.id}" data-type="fit">✦ Analizar FIT</button>
-          <button class="btn-ai cv    js-ai" data-id="${job.id}" data-type="cv">✦ Adaptar CV</button>
-          <button class="btn-ai carta js-ai" data-id="${job.id}" data-type="carta">✦ Crear Carta</button>
+          <button class="btn-ai fit      js-ai" data-id="${job.id}" data-type="fit">✦ Analizar FIT</button>
+          <button class="btn-ai cv       js-ai" data-id="${job.id}" data-type="cv">✦ Adaptar CV</button>
+          <button class="btn-ai mail     js-ai" data-id="${job.id}" data-type="mail">✉ Crear Mail</button>
+          <button class="btn-ai mensaje  js-ai" data-id="${job.id}" data-type="mensaje">💬 Crear Mensaje</button>
         </div>
       </div>
     </article>
@@ -199,9 +200,13 @@ async function handleAIAction(jobId, type) {
       prompt   = promptAdaptarCV(job, cvData);
       toastMsg = '✦ Prompt de CV copiado. ¡Pegalo en tu IA favorita!';
       break;
-    case 'carta':
-      prompt   = promptCarta(job, cvData);
-      toastMsg = '✦ Prompt de carta copiado. ¡Pegalo en tu IA favorita!';
+    case 'mail':
+      prompt   = promptMailPresentacion(job, cvData);
+      toastMsg = '✉ Prompt de mail copiado. ¡Pegalo en tu IA favorita!';
+      break;
+    case 'mensaje':
+      prompt   = promptMensajePresentacion(job, cvData);
+      toastMsg = '💬 Prompt de mensaje copiado. ¡Pegalo en tu IA favorita!';
       break;
     default:
       return;

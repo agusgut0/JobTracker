@@ -126,37 +126,47 @@ export function promptFIT(job, cvData) {
   const candidateName = cvData.nombre || 'Candidato';
   const cvBlock = formatCVForPrompt(cvData);
 
-  return `Actuá como un Lead Technical Recruiter y experto en selección de talento IT de alta exigencia. Tu objetivo es realizar un screening objetivo, riguroso y libre de sesgos normativos, penalizando la falta de evidencia explícita en el CV.
+  return `<rol>
+Eres un Lead Technical Recruiter especializado en selección de talento IT, con estándares de evaluación exigentes. Evalúas de forma objetiva y rigurosa, basado exclusivamente en evidencia explícita — nunca en suposiciones.
+</rol>
 
-Analizá la compatibilidad entre el CV del candidato y la oferta laboral provista.
+<tarea>
+Evalúa la compatibilidad entre el CV del candidato y la oferta laboral provistos en <datos>, y produce el reporte en el formato exacto de <formato_salida>.
+</tarea>
 
-=== INSTRUCCIONES DE EVALUACIÓN ===
-1. Sé estricto con el Seniority y los Stack Tecnológicos: Si la oferta pide una tecnología como "Excluyente" y no está explícita en el CV, asumí que no la posee y penalizá el puntaje.
-2. No asumas experiencia: La proximidad de un término no implica dominio. Evaluá según proyectos, años de uso o logros descritos.
-3. Justificación basada en datos: Cada fortaleza o brecha debe hacer referencia directa a una sección del CV o de la oferta.
+<reglas>
+1. Stack y seniority: si la oferta marca una tecnología como "Excluyente" y no aparece explícita en el CV, trátala como ausente y penaliza el score. La sola mención de un término en una lista de skills NO es evidencia de dominio — solo cuentan proyectos, años de uso o logros descritos.
+2. No infieras ni completes datos que no estén en el CV o la oferta. Si algo no es verificable, indícalo como brecha en vez de asumirlo.
+3. Cada fortaleza y cada brecha debe citar una referencia concreta (rol, proyecto o requisito puntual) del CV o la oferta.
+</reglas>
 
-=== CV DEL CANDIDATO (${candidateName}) ===
+<datos>
+<cv candidato="${candidateName}">
 ${cvBlock}
-
-=== OFERTA LABORAL ===
+</cv>
+<oferta>
 ${ofertaBlock(job)}
+</oferta>
+</datos>
 
-Respondé estrictamente con el siguiente formato Markdown, manteniendo un tono profesional, crítico y corporativo:
+<formato_salida>
+Responde ÚNICAMENTE en este Markdown, sin texto antes ni después, tono profesional y directo:
 
 ### 1. Score de Fit General
-* **Porcentaje de Fit:** [X]% (Calculado de forma matemática: ponderá 60% Hard Skills excluyentes, 20% Seniority/Metodologías, 20% Soft Skills/Cultura).
-* **Justificación Ejecutiva:** [Máximo 3 líneas que resuman el porqué de la calificación].
+* **Porcentaje de Fit:** [X]% — ponderación: 60% Hard Skills excluyentes + 20% Seniority/Metodologías + 20% Soft Skills/Cultura.
+* **Justificación Ejecutiva:** [máx. 3 líneas]
 
-### 2. Fortalezas Clave (Máx. 5 puntos)
-* [Categoría: Hard/Soft/Logro] - **[Habilidad]:** [Breve evidencia del CV que lo respalda].
+### 2. Fortalezas Clave (máx. 5)
+* [Hard/Soft/Logro] - **[Habilidad]:** [evidencia puntual del CV]
 
-### 3. Brechas Críticas y Áreas a Reforzar (Máx. 3 puntos)
-* [Categoría: Stack/Seniority/Falta de Evidencia] - **[Brecha]:** [Qué le falta o qué no está claro en el CV respecto a la oferta].
+### 3. Brechas Críticas (máx. 3)
+* [Stack/Seniority/Falta de Evidencia] - **[Brecha]:** [qué falta o no está claro]
 
 ### 4. Recomendación y Next Steps
-* **Decisión:** [Aplicar / Aplicar con nota de atención / No aplicar]
-* **Fundamento:** [Una sola línea estratégica].
-* **Pregunta de Validación:** [Sugerí una pregunta técnica o de comportamiento clave que el reclutador debería hacerle en la primera entrevista para validar la brecha más importante encontrada].`;
+* **Decisión:** Aplicar / Aplicar con nota de atención / No aplicar
+* **Fundamento:** [1 línea]
+* **Pregunta de Validación:** [1 pregunta técnica o conductual clave para validar la brecha más crítica en la entrevista]
+</formato_salida>`;
 }
 
 // ── Prompt: Adaptar CV ───────────────────────────────────────────────────────
@@ -168,155 +178,149 @@ export function promptAdaptarCV(job, cvData) {
   const cvBlock = formatCVForPrompt(cvData);
 
   return `<rol>
-Actuás como un Consultor Senior de Career Coaching y Especialista en Optimización de CVs para sistemas ATS (Applicant Tracking Systems), con más de 15 años de experiencia en reclutamiento técnico (IT/Software). Tu escritura combina precisión técnica con redacción ejecutiva persuasiva, sin caer en exageraciones ni en lenguaje corporativo vacío.
+Sos consultor senior de career coaching y optimización de CVs para ATS, con 15+ años en reclutamiento técnico (IT/Software). Escribís con precisión técnica y tono ejecutivo persuasivo, sin exagerar ni usar frases vacías.
 </rol>
 
-<contexto>
-Vas a recibir dos documentos:
-1. CV_ORIGINAL: el currículum actual del candidato.
-2. OFERTA_LABORAL: la descripción del puesto al que se postula.
+<reglas>
+1. FORMATO: tu respuesta es ÚNICAMENTE el bloque JSON del <esquema_json>, indentado con 2 espacios. Ningún texto antes, después, ni explicaciones. No omitas ninguna clave ni agregues claves nuevas.
+2. HONESTIDAD: NUNCA agregues tecnologías, empresas, títulos o logros que no figuren, explícita o razonablemente inferible, en el CV_ORIGINAL. Si un dato no existe, usá "" o [] — no lo inventes.
+3. EXPERIENCIA VS. PROYECTOS: NUNCA mezcles responsabilidades de un empleo formal con logros de proyectos personales/académicos/freelance. Si el "resumen" referencia experiencia de proyectos, aclaralo explícitamente (ej.: "Trabajé en proyectos que involucraban...").
+4. VOZ: primera persona del pasado ("Desarrollé", "Implementé", "Lideré"), tono ejecutivo natural, ni sumiso ni sobrevendido. Evitá adjetivos vacíos ("apasionado", "proactivo") salvo que el original los sostenga con evidencia concreta.
+5. MAPEO DE TECNOLOGÍAS EQUIVALENTES: si una tecnología real del candidato es funcionalmente equivalente a una de la oferta pero no idéntica, agrupalas bajo una categoría común: "[Categoría funcional] (tecnología real[, tecnología de la oferta si aplica])". Ej.: candidato usó MySQL, oferta pide PostgreSQL → "Motores Relacionales (MySQL, PostgreSQL)". Nunca afirmes que usó la tecnología exacta de la oferta si no la usó. Aplicá esto principalmente en "habilidadesTec"; en "descripcion" solo si suma claridad sin sonar forzado.
+6. CUANTIFICACIÓN: sumá métricas de impacto (%, tiempo, volumen, personas, reducción de errores) cuando el CV lo permita, aunque sea indirectamente (ej.: "equipo de 5 personas", "80+ estaciones"). Nunca inventes cifras que no surjan del texto o contexto original.
+7. PRIORIZACIÓN: analizá primero los requisitos duros, blandos y de seniority de la OFERTA_LABORAL — esto es tu proceso interno, no lo muestres en la salida. Con eso: ordená "habilidadesTec" de mayor a menor relevancia, priorizá y fusioná bullets de "descripcion" por impacto (eliminando los débiles o repetidos), y elegí qué "proyectos" incluir.
+</reglas>
 
-Tu tarea es generar una versión adaptada del CV, optimizada específicamente para esta oferta, conservando el 100% de veracidad de la información original. No es un CV nuevo: es el mismo candidato, mejor posicionado para este puesto puntual.
-</contexto>
-
-<objetivo>
-Producir un único objeto JSON con el CV adaptado, siguiendo ESTRICTAMENTE el esquema definido en <formato_salida>, aplicando todas las reglas de <reglas_fundamentales>.
-</objetivo>
-
-<reglas_fundamentales>
-
-**Regla 1 — Honestidad radical (no inventar):**
-Nunca agregues tecnologías, herramientas, empresas, títulos o logros que no figuren, de forma explícita o razonablemente inferible, en el CV_ORIGINAL. Adaptar no es inventar: es reordenar, priorizar y reformular con vocabulario más preciso.
-
-**Regla 2 — Separación experiencia real vs. proyectos:**
-Nunca mezcles responsabilidades de un empleo formal con resultados obtenidos en proyectos personales, académicos o freelance. Si en el "resumen" es relevante mencionar experiencia de proyectos, aclaralo de forma explícita (ej: "Trabajé en proyectos que involucraban...") para no generar ambigüedad sobre la seniority real del candidato.
-
-**Regla 3 — Voz y tono del candidato:**
-Mantené el tono real del candidato: ni sumiso ni sobrevendido. Redactá siempre en primera persona del pasado ("Desarrollé", "Implementé", "Lideré"), con vocabulario ejecutivo pero natural, evitando adjetivos vacíos ("apasionado", "proactivo por naturaleza", etc.) salvo que estén sostenidos por evidencia concreta en el texto original.
-
-**Regla 4 — Mapeo conceptual de tecnologías equivalentes:**
-Cuando una tecnología del CV_ORIGINAL sea funcionalmente equivalente a una requerida en la OFERTA_LABORAL pero no idéntica, no afirmes que el candidato usó la tecnología exacta que pide la oferta. En su lugar, usá un formato conceptual que agrupe ambas bajo una categoría funcional común, legible tanto por un reclutador humano como por un parser ATS.
-Formato: "[Categoría funcional] ([tecnología real del candidato], [tecnología de la oferta, solo si aplica])"
-Ejemplos:
-- Candidato usó MySQL, oferta pide PostgreSQL → "Motores Relacionales (MySQL, PostgreSQL)"
-- Candidato usó GitHub Actions, oferta pide Jenkins → "CI/CD (GitHub Actions)"
-Esta regla se aplica principalmente en "habilidadesTec", pero puede extenderse a "descripcion" si aporta claridad sin sonar forzado.
-
-**Regla 5 — Cuantificación de impacto:**
-Siempre que el CV_ORIGINAL lo permita (aunque sea de forma indirecta), agregá métricas de impacto (%, tiempo ahorrado, volumen de datos, cantidad de usuarios/equipos, reducción de errores, etc.). Si no hay datos numéricos explícitos, usá métricas de alcance o escala verificables a partir del contexto (ej: "equipo de X personas", "80+ estaciones de trabajo"). Nunca inventes cifras de la nada.
-
-**Regla 6 — Priorización por relevancia:**
-Analizá primero la OFERTA_LABORAL y extraé sus requisitos duros (hard skills), blandos y de seniority. Usá ese análisis para:
-(a) ordenar "habilidadesTec" de mayor a menor relevancia para la oferta,
-(b) ordenar los bullets dentro de cada "descripcion" por impacto/relevancia, eliminando puntos débiles o irrelevantes y fusionando los repetitivos,
-(c) decidir qué proyectos incluir o destacar en "proyectos".
-
-**Regla 7 — Formato de salida estricto:**
-La respuesta final debe ser un bloque de código JSON válido, sin textos introductorios ni explicaciones posteriores con indentación de 2 espacios.
-
-</reglas_fundamentales>
-
-<proceso>
-1. Extraé del CV_ORIGINAL: datos de contacto, resumen, experiencia laboral (diferenciando fechas exactas), proyectos, formación, habilidades técnicas y blandas, e idiomas.
-2. Extraé de la OFERTA_LABORAL: título del puesto, seniority esperado, hard skills (obligatorias vs. deseables), soft skills mencionadas, y palabras clave recurrentes (para optimización ATS).
-3. Cruzá ambos análisis aplicando las <reglas_fundamentales>.
-4. Generá el JSON final siguiendo el esquema exacto de <formato_salida>, sin omitir ni renombrar ninguna clave, y sin agregar claves nuevas.
-</proceso>
-
-<formato_salida>
+<esquema_json>
 {
-  "nombre": "[Nombre y Apellido del candidato extraído del CV]",
-  "rol": "[Título del rol técnico del puesto solicitado, posicionando de inmediato al candidato para el rol específico haciéndolo concordar con su experiencia real]",
-  "email": "[Email del candidato]",
-  "telefono": "[Teléfono del candidato]",
-  "linkedin": "[Enlace o usuario de LinkedIn]",
-  "portfolio": "[Enlace a GitHub o Portfolio si aplica, sino string vacío]",
-  "resumen": "[Párrafo compacto de máx. 6 líneas, basado estrictamente en el resumen del CV original, sin mezclar experiencia laboral real con experiencia de proyectos (ver Regla 2). Mantené la esencia, tono y enfoque del candidato, evitando ser complaciente o sobre-adaptarlo a la oferta. Integrá requisitos técnicos de la oferta solo si es absolutamente necesario y fluye de forma natural; el peso de la adaptación técnica debe recaer en Experiencia, Proyectos y Habilidades Técnicas.]",
+  "nombre": "Nombre y apellido del candidato",
+  "rol": "Título del rol técnico solicitado, alineado con la experiencia real del candidato",
+  "email": "Email del candidato",
+  "telefono": "Teléfono del candidato",
+  "linkedin": "Enlace o usuario de LinkedIn",
+  "portfolio": "Enlace a GitHub/portfolio, o \"\" si no aplica",
+  "resumen": "Máx. 6 líneas, basado en el resumen del CV original. No mezcles experiencia laboral con experiencia de proyectos (regla 3). Integrá requisitos de la oferta solo si fluye natural — el peso de la adaptación va en experiencia/proyectos/habilidades.",
   "experiencia": [
     {
-      "rol": "[Puesto o cargo adaptado formalmente]",
-      "lugar": "[Empresa u organización]",
-      "fechaInicio": "[Fecha en formato YYYY-MM o según CV original]",
-      "fechaFin": "[Fecha en formato YYYY-MM o vacío si es actualidad]",
-      "actualidad": "[true o false según corresponda]",
-      "descripcion": "[Lista HTML <ul><li>...</li></ul> con 3 a 5 bullets de impacto técnico reescritos, aplicando Reglas 3, 5 y 6: verbos de acción fuertes en primera persona del pasado, tecnologías clave resaltadas con <strong>, puntos reordenados por importancia, puntos débiles/irrelevantes eliminados, puntos repetitivos fusionados, impacto cuantificado siempre que sea posible, énfasis en liderazgo/ownership/impacto de negocio. Cada punto debe respaldar esta postulación sin mencionarla directamente.]"
+      "rol": "Puesto adaptado formalmente",
+      "lugar": "Empresa u organización",
+      "fechaInicio": "YYYY-MM o formato del CV original",
+      "fechaFin": "YYYY-MM, o \"\" si es actualidad",
+      "actualidad": "true / false — valor booleano en la salida, SIN comillas",
+      "descripcion": "<ul><li>...</li></ul> con 3-5 bullets: verbos de acción fuertes en 1ra persona del pasado, tecnologías clave en <strong>, ordenados por impacto, sin puntos débiles ni repetidos, con métricas cuando sea posible, enfocados en ownership/impacto de negocio"
     }
   ],
   "proyectos": [
     {
-      "nombre": "[Nombre del proyecto adaptado formalmente]",
-      "descripcion": "[Descripción del proyecto optimizada con palabras clave de la oferta, sin perder la idea central del proyecto]"
+      "nombre": "Nombre del proyecto adaptado formalmente",
+      "descripcion": "Descripción optimizada con palabras clave de la oferta, sin perder la idea central"
     }
   ],
-  "habilidadesTec": [
-    "[Lista de tecnologías ordenadas de mayor a menor importancia según la oferta. Al mapear equivalencias, aplicá el formato conceptual de la Regla 4 para pasar filtros ATS sin faltar a la verdad]"
-  ],
+  "habilidadesTec": ["Tecnologías ordenadas de mayor a menor relevancia para la oferta, aplicando el mapeo conceptual (regla 5) donde corresponda"],
   "formacion": [
     {
-      "titulo": "[Título académico o certificación]",
-      "institucion": "[Universidad o academia]",
-      "fechaInicio": "[Fecha de inicio o string vacío]",
-      "fechaFin": "[Fecha de fin o string vacío]",
-      "actualidad": "[true o false]"
+      "titulo": "Título o certificación",
+      "institucion": "Universidad o academia",
+      "fechaInicio": "Fecha o \"\"",
+      "fechaFin": "Fecha o \"\"",
+      "actualidad": "true / false — valor booleano en la salida, SIN comillas"
     }
   ],
-  "habilidadesBlandas": [
-    "[Máximo 4 competencias interpersonales o metodológicas demostradas implícitamente en la experiencia, sin clichés. Si el puesto requiere alguna específica, se puede agregar cumpliendo el mismo criterio]"
-  ],
+  "habilidadesBlandas": ["Máx. 4 competencias demostradas implícitamente en la experiencia, sin clichés"],
   "idiomas": [
     {
-      "nombre": "[Idioma]",
-      "nivel": "[Nivel alcanzado según el CV original]"
+      "nombre": "Idioma",
+      "nivel": "Nivel según el CV original"
     }
   ]
 }
-</formato_salida>
+</esquema_json>
 
-<instruccion_final>
-A continuación te adjunto el CV_ORIGINAL y la OFERTA_LABORAL de ${candidateName}. Analizalos aplicando el <proceso> y devolveme EXCLUSIVAMENTE el JSON adaptado (con indentación de 2 espacios, legible y formateado con saltos de línea), cumpliendo cada una de las <reglas_fundamentales>.
-
+<datos>
 CV_ORIGINAL:
 ${cvBlock}
 
 OFERTA_LABORAL:
 ${ofertaBlock(job)}
-</instruccion_final>`;
+</datos>
+
+Generá el CV adaptado de ${candidateName} aplicando las <reglas> al <esquema_json>. Devolvé EXCLUSIVAMENTE el JSON, sin texto introductorio ni posterior.`;
 }
 
-// ── Prompt: Crear Carta de Presentación ─────────────────────────────────────
+// ── Prompt: Crear Mail de Presentación ──────────────────────────────────────
 /**
- * Full autonomous cover letter prompt (works in any AI).
+ * Generates a 3-paragraph professional email pitch prompt.
  */
-export function promptCarta(job, cvData) {
+export function promptMailPresentacion(job, cvData) {
   const candidateName = cvData.nombre || 'Candidato';
   const cvBlock = formatCVForPrompt(cvData);
 
-  return `Actuá como un experto en Outbound Recruiting y Copywriting Profesional para el sector IT. 
+  return `<rol>
+Sos un experto en Outbound Recruiting y Copywriting profesional para el sector IT.
+</rol>
 
-Tu objetivo es redactar un mensaje de contacto (Pitch de Enganche) hiperconciso, directo y de alto impacto para enviarle a un reclutador. El texto debe generar la curiosidad justa para que el reclutador desee abrir el CV adjunto o revisar el perfil del candidato, evitando repetir el CV entero en prosa.
+<reglas>
+1. FORMATO: devolvé ÚNICAMENTE el <formato_salida> completado. Sin texto antes, después, ni explicaciones.
+2. BREVEDAD: el cuerpo no supera las 150 palabras (sin contar el asunto). Directo, sin relleno.
+3. ESTRUCTURA: exactamente 3 párrafos.
+   - P1: saludo directo (con [Nombre del Recruiter] si aplica, sin fórmulas formales) + una línea de quién sos.
+   - P2: interés puntual en la vacante + el cruce más fuerte entre tu experiencia y lo que pide la oferta.
+   - P3: motivación concreta por la empresa/el desafío + disponibilidad inmediata. Cierre breve y cordial, firmado ${candidateName} (sin frases de cortesía genéricas).
+4. ENFOQUE EN VALOR: no digas "tengo experiencia en X" — redactá como "en mi rol actual me enfoco en resolver [problema clave de la oferta] mediante [habilidad/herramienta real del candidato]".
+5. TONO: profesional, moderno, fresco, al grano. NUNCA uses saludos ultra-formales ("Estimado/a señor/a", "De mi mayor consideración") ni cierres cliché ("quedo a la espera de su respuesta", "agradezco su atención, espero que tengan un buen día").
+6. HONESTIDAD: no menciones habilidades, tecnologías o logros que no figuren en el CV_ORIGINAL.
+</reglas>
 
-=== REGLAS DE REDACCIÓN ===
-1. BREVEDAD ABSOLUTA: El mensaje no debe superar las 150 palabras en su versión de Email y debe ser extremadamente directo.
-2. ENFOQUE EN VALOR: En lugar de decir "tengo experiencia en X", redactalo como "en mi rol actual me enfoco en resolver [Problema clave de la oferta] mediante [habilidades/herramientas relevantes del candidato]".
-3. TONO: Profesional, moderno, fresco y al grano. Quedan prohibidos los saludos excesivamente formales (ej: "De mi mayor consideración", "Estimado/a señor/a") y las frases cliché.
+<formato_salida>
+Asunto: [asunto magnético y específico a la vacante]
 
-=== CV DEL CANDIDATO (${candidateName}) ===
+[cuerpo del email en 3 párrafos según regla 3]
+</formato_salida>
+
+<datos>
+CV_ORIGINAL (${candidateName}):
 ${cvBlock}
 
-=== OFERTA LABORAL ===
+OFERTA_LABORAL:
 ${ofertaBlock(job)}
+</datos>
 
-Analizá la oferta y devolvé **únicamente** las siguientes dos opciones de mensajes listos para rellenar (con marcadores entre corchetes como [Nombre del Recruiter] si aplica):
+Generá el email aplicando las <reglas>. Devolvé EXCLUSIVAMENTE el <formato_salida> completado, sin texto antes ni después.`;
+}
 
-### Opción 1: Versión para Email (Forzar estructura rígida de 3 párrafos)
-[Escribí un asunto magnético. El cuerpo debe tener exactamente 3 párrafos:
-P1: Resumen breve de tu perfil.
-P2: Interés en la vacante X + "Soy especialista en...".
-P3: Motivación por la empresa, retos y disponibilidad.
-Cierre estricto (copiar literal): "de antemano agradezco su atención, espero que tengan un buen día. Atte. ${candidateName}"].
+// ── Prompt: Crear Mensaje de Presentación ───────────────────────────────────
+/**
+ * Generates an ultra-short LinkedIn-style message pitch prompt.
+ */
+export function promptMensajePresentacion(job, cvData) {
+  const candidateName = cvData.nombre || 'Candidato';
+  const cvBlock = formatCVForPrompt(cvData);
 
-### Opción 2: Versión para LinkedIn (Formato ultra-corto de red)
-[Generá un mensaje con exactamente esta estructura rellenando los corchetes: "Hola [Nombre de recruiter]! vi la búsqueda de [Postulación laboral] y creo que mi experiencia encaja con el puesto... [Texto breve de match]... Te dejo mi CV si te interesa profundizar. Saludos!"].`;
+  return `<rol>
+Sos un experto en Outbound Recruiting y Copywriting profesional para el sector IT.
+</rol>
+
+<reglas>
+1. FORMATO: devolvé ÚNICAMENTE el <formato_salida> completado. Sin texto antes, después, ni explicaciones.
+2. BREVEDAD: mensaje ultra-corto — 2 a 4 líneas máximo, una sola idea de match.
+3. ENFOQUE EN VALOR: mencioná el cruce más fuerte entre tu perfil y la vacante en una frase concreta, no una lista de habilidades.
+4. TONO: profesional pero informal y cercano, como un mensaje real entre personas — sin firmas ni fórmulas de email.
+5. HONESTIDAD: no menciones habilidades, tecnologías o logros que no figuren en el CV_ORIGINAL.
+</reglas>
+
+<formato_salida>
+"¡Hola [Nombre de recruiter]! Vi la búsqueda de [nombre de la vacante] y creo que mi experiencia encaja: [una frase de match real, basada en el CV]. Te dejo mi CV si querés profundizar. ¡Saludos!"
+</formato_salida>
+
+<datos>
+CV_ORIGINAL (${candidateName}):
+${cvBlock}
+
+OFERTA_LABORAL:
+${ofertaBlock(job)}
+</datos>
+
+Generá el mensaje aplicando las <reglas>. Devolvé EXCLUSIVAMENTE el <formato_salida> completado, sin texto antes ni después.`;
 }
 
 // ── Filename helpers ─────────────────────────────────────────────────────────

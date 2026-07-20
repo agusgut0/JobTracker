@@ -857,8 +857,10 @@ textarea { resize: vertical; min-height: 72px; }
 .btn-ai.fit:hover { background: #ede9fe; }
 .btn-ai.cv       { border-color: #2d5a8e44; color: var(--accent); background: var(--accent-light); }
 .btn-ai.cv:hover  { background: #d4e4f5; }
-.btn-ai.carta    { border-color: #05796644; color: var(--green); background: var(--green-light); }
-.btn-ai.carta:hover { background: #d1fae5; }
+.btn-ai.mail     { border-color: #05796644; color: var(--green); background: var(--green-light); }
+.btn-ai.mail:hover { background: #d1fae5; }
+.btn-ai.mensaje  { border-color: #b4560044; color: #92400e; background: #fef3c7; }
+.btn-ai.mensaje:hover { background: #fde68a; }
 
 /* Paste / download area */
 .paste-area {
